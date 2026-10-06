@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>مِخّك M5K — ألعاب أسئلة وتحديات ممتعة</title>
+  <meta name="description" content="مِخّك M5K لعبة أسئلة وتحديات عربية مجانية. اختبر معلوماتك، خمن المشاهير واليوتيوبرز، العب بالإيموجي وتحدى أصحابك.">
+  <meta name="keywords" content="مِخّك, M5K, ألعاب أسئلة, أسئلة عامة, تحديات, لعبة أسئلة عربية, خمن المشهور, خمن اليوتيوبر, ألعاب جماعية">
+  <meta name="robots" content="index,follow">
+  <meta name="theme-color" content="#0b0b12">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="512x512" href="og-image.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta property="og:image" content="og-image.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:site_name" content="مِخّك M5K">
+  <meta property="og:title" content="مِخّك M5K — ألعاب أسئلة وتحديات">
+  <meta property="og:description" content="اختبر معلوماتك وتحدى أصحابك في ألعاب أسئلة عربية ممتعة.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <a class="brand" href="#" onclick="show('home');return false;"><span>مِخّك</span><b>M5K</b></a>
+    <nav>
+      <button onclick="show('home')">الرئيسية</button>
+      <button onclick="show('games')">الألعاب</button>
+      <button onclick="show('leaders')">المتصدرون</button>
+      <button onclick="show('contact')">تواصل معنا</button>
+      <button onclick="show('social')">حساباتي</button>
+    </nav>
+
+  <div class="account-area"><span id="accountStatus">زائر</span><button class="account-btn" onclick="openAuth('login')">تسجيل الدخول</button></div>
+  </header>
+
+  <main>
+    <section id="home" class="page active">
+      <div class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">🎮 لعبة الأسئلة العربية</span>
+          <h1>خلك أذكى من<br><strong>أصحابك.</strong></h1>
+          <p>أسئلة، تحديات، نقاط ومنافسة مباشرة. أنشئ لعبتك وخلّ الحماس يبدأ.</p>
+          <div class="actions">
+            <button class="primary" onclick="show('create')">ابدأ اللعب <span>←</span></button>
+
+          </div>
+          <div class="mini-stats"><span>⚡ سريع</span><span>👥 جماعي</span><span>🧠 ممتع</span></div>
+        </div>
+        <div class="hero-card" onclick="startFriendsSetup()" style="cursor:pointer">
+          <div class="orb">🧠</div>
+          <div id="friendsLiveStatus" class="live offline">○ لا توجد غرفة LIVE</div>
+          <h3>تحدي الأصدقاء</h3>
+          <p>غرف الأصدقاء المباشرة</p>
+          <div class="score-row"><b id="friendsLiveCount">0</b><span>لاعب الآن</span></div>
+          <div id="friendsLivePlayers" class="players"><span class="live-empty">لا توجد غرفة نشطة الآن</span></div>
+        </div>
+      </div>
+      <div class="section-title"><div><span>🔥 ألعاب مميزة</span><h2>جرّبها الآن ثم اكتشف باقي الألعاب</h2><p class="section-sub">اختر لعبة واضغط «العب» — عندك أكثر من 20 تحديًا داخل خانة الألعاب.</p></div><button class="see-all-btn" onclick="show('games')">🎮 كل الألعاب ←</button></div>
+      <div class="game-grid featured-games">
+        <article class="game-card featured-card" onclick="chooseMode('quiz')"><div class="icon purple">🧠</div><div class="featured-info"><h3>من يعرف أكثر؟</h3><p>معلومات عامة وفئات متنوعة.</p></div><button class="play-btn" onclick="event.stopPropagation();chooseMode('quiz')">العب</button></article>
+        <article class="game-card featured-card" onclick="chooseMode('imageguess')"><div class="icon blue">🖼️</div><div class="featured-info"><h3>خمن الصورة</h3><p>شاهد الصورة وخمّن العلامة الصحيحة.</p></div><button class="play-btn" onclick="event.stopPropagation();chooseMode('imageguess')">العب</button></article>
+        <article class="game-card featured-card" onclick="chooseMode('playerguess')"><div class="icon pink">⚽</div><div class="featured-info"><h3>خمن اللاعب</h3><p>شاهد اللاعب واختر اسمه.</p></div><button class="play-btn" onclick="event.stopPropagation();chooseMode('playerguess')">العب</button></article>
+        <article class="game-card featured-card" onclick="chooseMode('emoji')"><div class="icon purple">🎭</div><div class="featured-info"><h3>خمن بالإيموجي</h3><p>فك الرموز وخمّن الإجابة.</p></div><button class="play-btn" onclick="event.stopPropagation();chooseMode('emoji')">العب</button></article>
+        <article class="game-card featured-card" onclick="chooseMode('flagguess')"><div class="icon blue">🏳️</div><div class="featured-info"><h3>خمن العلم</h3><p>شاهد العلم واختر الدولة الصحيحة.</p></div><button class="play-btn" onclick="event.stopPropagation();chooseMode('flagguess')">العب</button></article>
+      </div>
+    </section>
+
+    <section id="games" class="page">
+      <div class="center-head"><span class="eyebrow">الألعاب</span><h1>اختر تحديك</h1><p>ابدأ جلسة جديدة مع أصحابك.</p></div>
+      <div class="game-grid">
+<article class="game-card" onclick="startFriendsSetup()"><div class="icon purple">👥</div><h3>تحدي الأصدقاء</h3><p>العبوا معًا بالأدوار على نفس الجهاز.</p><button class="play-btn" onclick="event.stopPropagation();startFriendsSetup()">العب</button></article>
+<article class="game-card" onclick="chooseMode('quiz')"><div class="icon purple">🧠</div><h3>من يعرف أكثر؟</h3><p>معلومات عامة وفئات متنوعة.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('quiz')">العب</button></article>
+<article class="game-card" onclick="chooseMode('speed')"><div class="icon blue">⚡</div><h3>تحدي السرعة</h3><p>جاوب بسرعة قبل انتهاء الوقت.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('speed')">العب</button></article>
+<article class="game-card" onclick="chooseMode('guess')"><div class="icon pink">🎯</div><h3>خمنها</h3><p>اكتشف الإجابة من التلميحات.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('guess')">العب</button></article>
+<article class="game-card" onclick="chooseMode('imageguess')"><div class="icon blue"><img src="images/imageguess.svg" alt="خمن الصورة"></div><h3>خمن الصورة</h3><p>شاهد المنتج بعد إخفاء اسم الشركة واختر العلامة الصحيحة.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('imageguess')">العب</button></article>
+<article class="game-card" onclick="chooseMode('playerguess')"><div class="icon pink">⚽</div><h3>خمن اللاعب</h3><p>شاهد وجه اللاعب كاملًا واختر اسمه.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('playerguess')">العب</button></article><article class="game-card" onclick="chooseMode('celebrityguess')"><div class="icon orange">🌟</div><h3>خمن المشهور</h3><p>شاهد صورة المشهور أو اليوتيوبر واختر اسمه.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('celebrityguess')">العب</button></article><article class="game-card" onclick="chooseMode('youtuberguess')"><div class="icon red">▶️</div><h3>خمن اليوتيوبر</h3><p>شاهد صورة يوتيوبر عربي أو أجنبي واختر اسمه.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('youtuberguess')">العب</button></article><article class="game-card" onclick="chooseMode('emoji')"><div class="icon purple">🎭</div><h3>خمن بالإيموجي</h3><p>فك الإيموجيات وخمّن الفيلم أو اللعبة أو الشخصية.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('emoji')">العب</button></article>
+<article class="game-card" onclick="chooseMode('flagguess')"><div class="icon blue">🏳️</div><h3>خمن العلم</h3><p>شاهد العلم واختر اسم الدولة الصحيحة.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('flagguess')">العب</button></article>
+<article class="game-card" onclick="chooseMode('currencyguess')"><div class="icon green">💰</div><h3>عملة أي دولة؟</h3><p>شاهد اسم العملة وخمّن الدولة.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('currencyguess')">العب</button></article>
+<article class="game-card" onclick="chooseMode('foodguess')"><div class="icon orange">🍽️</div><h3>من أي بلد؟</h3><p>خمّن البلد الذي يشتهر بهذا الطعام.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('foodguess')">العب</button></article>
+<article class="game-card" onclick="chooseMode('pattern')"><div class="icon blue">🔢</div><h3>أكمل النمط</h3><p>اكتشف الرقم التالي قبل انتهاء الوقت.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('pattern')">العب</button></article>
+<article class="game-card" onclick="chooseMode('wordmix')"><div class="icon purple">🔤</div><h3>فك الكلمة</h3><p>رتّب الحروف واكتشف الكلمة الصحيحة.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('wordmix')">العب</button></article>
+<article class="game-card" onclick="chooseMode('bigger')"><div class="icon pink">📏</div><h3>أيهما أكبر؟</h3><p>اختبر سرعتك في المقارنة.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('bigger')">العب</button></article>
+<article class="game-card" onclick="chooseMode('whami')"><div class="icon pink">🕵️</div><h3>من أنا؟</h3><p>اقرأ التلميحات واكتشف الشخصية.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('whami')">العب</button></article>
+<article class="game-card" onclick="chooseMode('riddle')"><div class="icon purple">🧩</div><h3>لغز سريع</h3><p>ألغاز قصيرة تحتاج تركيزًا وسرعة.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('riddle')">العب</button></article>
+<article class="game-card" onclick="chooseMode('cityguess')"><div class="icon blue">🏙️</div><h3>خمن المدينة</h3><p>خمّن المدينة من التلميحات.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('cityguess')">العب</button></article>
+<article class="game-card" onclick="chooseMode('translate')"><div class="icon green">🌐</div><h3>ترجمة سريعة</h3><p>اختبر سرعة مفرداتك الإنجليزية.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('translate')">العب</button></article>
+<article class="game-card" onclick="chooseMode('memory')"><div class="icon purple">🧠</div><h3>ذاكرة سريعة</h3><p>تذكّر التسلسل واختر الإجابة قبل انتهاء الوقت.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('memory')">العب</button></article>
+<article class="game-card" onclick="chooseMode('math')"><div class="icon green">➗</div><h3>حساب خاطف</h3><p>حل العمليات الحسابية بأسرع وقت.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('math')">العب</button></article>
+<article class="game-card" onclick="chooseMode('password')"><div class="icon orange">🔐</div><h3>كلمة السر</h3><p>اعرف الكلمة من الوصف.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('password')">العب</button></article>
+<article class="game-card" onclick="chooseMode('tf')"><div class="icon green"><img src="images/truefalse-check.svg" alt="صح"></div><h3>صح أو خطأ</h3><p>اختبر معلوماتك بسرعة.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('tf')">العب</button></article>
+<article class="game-card" onclick="chooseMode('mixed')"><div class="icon purple">🧩</div><h3>أسئلة متنوعة وعشوائية</h3><p>مزيج من جميع الأنماط.</p><button class="play-btn" onclick="event.stopPropagation();chooseMode('mixed')">العب</button></article>
+</div>
+    </section>
+
+    <section id="friendsSetup" class="page">
+      <div class="panel form-panel friends-online-panel">
+        <span class="eyebrow">👥 لعب جماعي أونلاين</span><h1>تحدي الأصدقاء</h1>
+        <p>أنشئ غرفة وشارك الكود مع أصدقائك، أو ادخل غرفة موجودة.</p>
+        <label>اسمك<input id="friendOnlineName" maxlength="20" placeholder="مثال: TOUFIK"></label>
+        <label>عدد الأسئلة<select id="friendQCount"><option>10</option><option selected>15</option><option>20</option><option>25</option><option>30</option></select></label>
+        <div class="friend-room-actions">
+          <button class="primary" onclick="createOnlineFriendRoom()">🏠 إنشاء غرفة</button>
+          <div class="room-join-row"><input id="friendRoomCode" maxlength="6" placeholder="كود الغرفة"><button class="secondary" onclick="joinOnlineFriendRoom()">🚪 دخول</button></div>
+        </div>
+        <p id="friendOnlineMsg" class="answer-msg"></p>
+      </div>
+    </section>
+
+    <section id="create" class="page">
+      <div class="panel form-panel">
+        <span class="eyebrow">جلسة جديدة</span><h1>أنشئ لعبة</h1><p>اضبط الجلسة ثم شارك الكود مع أصحابك.</p>
+        <label>اسم اللاعب<input id="playerName" maxlength="20" placeholder="اكتب اسمك" required></label><label>اسم اللعبة<input id="gameName" value="تحدي الأصدقاء"></label>
+        <label>عدد الأسئلة / الصور<select id="qCount"><option>10</option><option selected>15</option><option>20</option><option>25</option><option>30</option></select></label>
+        <label>الفئة<select id="category"><option>منوعات</option><option>رياضة</option><option>تكنولوجيا</option><option>جغرافيا</option><option>تاريخ</option></select></label>
+        <button class="primary full" onclick="startGame()">ابدأ التحدي</button>
+      </div>
+    </section>
+
+
+    <section id="lobby" class="page">
+      <div class="panel lobby">
+        <div class="lobby-code"><span>كود الغرفة</span><b id="gameCode">------</b><button onclick="copyCode()">نسخ</button></div>
+        <h1 id="lobbyTitle">تحدي الأصدقاء أونلاين</h1><p id="lobbySub">شارك الكود مع أصدقائك وانتظر دخولهم.</p>
+        <div id="onlinePlayerList" class="player-list"></div>
+        <div id="lobbyHostControls"><label>عدد الأسئلة<select id="onlineQCount"><option>10</option><option selected>15</option><option>20</option><option>25</option><option>30</option></select></label><button class="primary full" onclick="startOnlineFriendGame()">🚀 ابدأ اللعبة</button></div>
+        <p id="lobbyMsg" class="answer-msg"></p>
+      </div>
+    </section>
+
+    <section id="social" class="page">
+      <div class="center-head"><span class="eyebrow">🌐 حساباتي</span><h1>تابعني على منصات التواصل</h1><p>تابع حساباتي لمعرفة جديد مِخّك والمشاريع والتحديثات.</p></div>
+      <div class="social-grid">
+        <a class="social-card instagram" href="https://www.instagram.com/n_3__x/" target="_blank" rel="noopener noreferrer"><span class="social-icon">◎</span><div><strong>Instagram</strong><small>@n_3__x</small></div><b>↗</b></a>
+        <a class="social-card facebook" href="https://www.facebook.com/toufikmamadi" target="_blank" rel="noopener noreferrer"><span class="social-icon">f</span><div><strong>Facebook</strong><small>toufikmamadi</small></div><b>↗</b></a>
+        <a class="social-card github" href="https://github.com/tofiktf9" target="_blank" rel="noopener noreferrer"><span class="social-icon">⌘</span><div><strong>GitHub</strong><small>tofiktf9</small></div><b>↗</b></a>
+      </div>
+    </section>
+
+    <section id="contact" class="page">
+      <div class="center-head"><span class="eyebrow">📩 تواصل معنا</span><h1>عندك اقتراح أو مشكلة؟</h1><p>اكتب رسالتك وسيفتح لك بريدك لإرسالها مباشرة إلى فريق مِخّك.</p></div>
+      <div class="panel contact-panel">
+        <label class="contact-label">اسمك<input id="contactName" class="contact-input" maxlength="40" placeholder="اكتب اسمك"></label>
+        <label class="contact-label">البريد الإلكتروني<input id="contactEmail" class="contact-input" type="email" maxlength="100" placeholder="example@gmail.com"></label>
+        <label class="contact-label">رسالتك<textarea id="contactMessage" class="contact-input contact-textarea" maxlength="2000" placeholder="اكتب رسالتك أو اقتراحك هنا..."></textarea></label>
+        <button class="primary full" onclick="sendContactMessage()">📨 إرسال الرسالة</button>
+        <p class="contact-note">ملاحظة: لأن الموقع يعمل بدون خادم، سيتم فتح تطبيق البريد لديك لإرسال الرسالة.</p>
+      </div>
+    </section>
+
+    <section id="privacy" class="page">
+      <div class="panel legal-panel"><span class="eyebrow">🔒 الخصوصية</span><h1>سياسة الخصوصية</h1>
+      <p>نحترم خصوصيتك. موقع مِخّك يعمل حاليًا داخل المتصفح، ولا يحتاج إلى إنشاء حساب لاستخدام الألعاب الأساسية.</p>
+      <h3>البيانات المحلية</h3><p>قد يحفظ الموقع بعض بيانات اللعب والنتائج في LocalStorage على جهازك لتحسين تجربة اللعب. هذه البيانات لا تُرسل تلقائيًا إلى خادم من طرف مِخّك في النسخة الحالية.</p>
+      <h3>الصور والمصادر الخارجية</h3><p>بعض صور ألعاب المشاهير واليوتيوبرز يتم تحميلها من خدمات خارجية مثل Wikipedia/Wikimedia، وقد تطبق تلك الخدمات سياساتها الخاصة.</p>
+      <h3>التواصل</h3><p>إذا تواصلت معنا عبر البريد، ستصلنا المعلومات التي تضعها في رسالتك، ونستخدمها فقط للرد على طلبك.</p>
+      <h3>الإعلانات</h3><p>قد نضيف خدمات إعلانية مستقبلًا. عند ذلك سيتم تحديث هذه السياسة لتوضيح ملفات الارتباط وتقنيات الإعلانات المستخدمة.</p></div>
+    </section>
+
+    <section id="terms" class="page">
+      <div class="panel legal-panel"><span class="eyebrow">📜 الشروط</span><h1>شروط الاستخدام</h1>
+      <p>باستخدام مِخّك، توافق على استخدام الموقع للأغراض الشخصية والترفيهية وبطريقة قانونية.</p>
+      <h3>المحتوى</h3><p>الأسئلة والتحديات مقدمة للترفيه وقد تحتوي على أخطاء أو معلومات قابلة للتغير. لا تعتمد على نتائج اللعبة كمصدر رسمي.</p>
+      <h3>الاستخدام المقبول</h3><p>يُمنع استخدام الموقع بطريقة تضر بالموقع أو تحاول تعطيل خدماته أو استغلاله بطريقة غير مشروعة.</p>
+      <h3>الخدمات الخارجية</h3><p>قد تعتمد بعض الصور أو الخدمات على جهات خارجية، وقد تتغير إمكانية الوصول إليها دون إشعار مسبق.</p>
+      <h3>التحديثات</h3><p>يمكننا تعديل الألعاب والأسئلة والميزات وتحسين الموقع في أي وقت.</p></div>
+    </section>
+
+
+    <section id="auth" class="page">
+      <div class="panel form-panel auth-panel">
+        <span class="eyebrow">👤 حساب M5K</span>
+        <h1 id="authTitle">تسجيل الدخول</h1>
+        <p id="authSubtitle">سجّل دخولك لحفظ نتائجك في المتصدرين العالميين.</p>
+        <label id="authUsernameWrap" style="display:none">اسم المستخدم<input id="authUsername" maxlength="30" placeholder="username"></label>
+        <label><span id="authLoginLabel">البريد الإلكتروني</span><input id="authEmail" type="email" maxlength="190" placeholder="example@gmail.com"></label>
+        <label>كلمة المرور<input id="authPassword" type="password" maxlength="100" placeholder="password" autocomplete="current-password"></label>
+        <button class="primary full" id="authSubmit" onclick="submitAuth()">تسجيل الدخول</button>
+        <button class="auth-switch" id="authSwitch" onclick="toggleAuthMode()">ليس لديك حساب؟ إنشاء حساب</button>
+        <p id="authMsg" class="answer-msg"></p>
+      </div>
+    </section>
+
+    <section id="quiz" class="page">
+      <div class="quiz-top"><span id="qNumber">السؤال 1 / 10</span><div class="timer"><span id="timer">15</span></div><span>النقاط: <b id="scoreNow">0</b></span><div class="quiz-actions"><button class="hint-btn" onclick="useNextHint()">🔮 تلميح (1)</button><button class="exit-game-btn" onclick="requestExitGame()">🚪 خروج</button></div></div>
+      <div class="progress"><i id="progress"></i></div>
+      <div class="quiz-box"><span class="category-tag" id="qCat">منوعات</span><h1 id="questionText">...</h1><div id="answers" class="answers"></div></div>
+      <div id="answerMsg" class="answer-msg"></div>
+    </section>
+
+    <div id="exitGameModal" class="exit-modal" role="dialog" aria-modal="true" aria-labelledby="exitGameTitle">
+      <div class="exit-modal-card">
+        <div class="exit-modal-icon">🎮</div>
+        <h2 id="exitGameTitle">هل تريد الخروج من اللعبة؟</h2>
+        <p>إذا خرجت الآن لن يتم حفظ نتيجة هذه الجولة.</p>
+        <div class="exit-modal-actions">
+          <button class="primary" onclick="closeExitGame()">▶️ أكمل اللعب</button>
+          <button class="secondary" onclick="confirmExitGame()">🚪 خروج</button>
+        </div>
+      </div>
+    </div>
+
+    <section id="result" class="page">
+<div class="finish">
+<div class="trophy">🏆</div>
+<h1 id="resultTitle">انتهت اللعبة!</h1>
+<p id="resultText"></p>
+<div class="score-big"><span id="resultScore">0</span> نقطة</div>
+<div class="finish-actions"><button class="primary big" onclick="playAgain()">🔄 العب مرة أخرى</button><button class="secondary big" onclick="show('games')">🎮 اختر لعبة أخرى</button></div>
+</div>
+</section>
+
+    <section id="leaders" class="page">
+      <div class="center-head"><span class="eyebrow">المتصدرون</span><h1>أفضل اللاعبين 🏆</h1></div>
+      <div class="leaderboard"></div>
+    </section>
+
+
+  </main>
+  <footer><b>مِخّك</b> — العب. نافس. اثبت نفسك. <span>© 2026</span> <span><button class="footer-link" onclick="show('privacy')">الخصوصية</button> <button class="footer-link" onclick="show('terms')">الشروط</button> <button class="footer-link" onclick="show('contact')">تواصل معنا</button> <button class="footer-link" onclick="show('social')">حساباتي</button></span></footer>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

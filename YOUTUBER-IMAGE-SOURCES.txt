@@ -1,0 +1,7 @@
+M5K v15 YouTuber image sources
+================================
+- AboFlah: Wikimedia Commons, File:أبو فلة.jpg (CC BY 3.0)
+- Noor Stars: Wikimedia Commons, File:Noor Naem.jpg / File:Noor Stars.jpg (CC BY 3.0)
+- Bilal Fadili: YouTube profile image surfaced through Social Blade for @bilalfadil.
+- Other creators: images are requested from their English Wikipedia page thumbnails through the MediaWiki APIs at runtime.
+The game needs an internet connection for remote images.

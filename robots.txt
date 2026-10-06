@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://m5k-game.com/sitemap.xml
