@@ -1,3 +1,13 @@
+const API_BASE = 'https://m5k.onrender.com';
+
+const originalFetch = window.fetch.bind(window);
+
+window.fetch = (input, init) => {
+  if (typeof input === 'string' && input.startsWith('/api/')) {
+    input = API_BASE + input;
+  }
+  return originalFetch(input, init);
+};
 
 const ID_ALIASES = {
   questionNumber: ["questionNumber", "qNumber", "counter"],
