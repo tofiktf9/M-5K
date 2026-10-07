@@ -1345,39 +1345,6 @@ async function updateLeaders(){
   }
 }
 
-let authMode='login';
-function openAuth(mode='login'){authMode=mode; show('auth'); renderAuth();}
-function toggleAuthMode(){authMode=authMode==='login'?'register':'login';renderAuth();}
-function renderAuth(){
-  const reg=authMode==='register';
-  if(el('authTitle')) el('authTitle').textContent=reg?'إنشاء حساب':'تسجيل الدخول';
-  if(el('authSubtitle')) el('authSubtitle').textContent=reg?'أنشئ حسابًا واحفظ نتائجك في المتصدرين العالميين.':'سجّل دخولك لحفظ نتائجك في المتصدرين العالميين.';
-  if(el('authUsernameWrap')) el('authUsernameWrap').style.display=reg?'block':'none';
-  if(el('authLoginLabel')) el('authLoginLabel').textContent=reg?'البريد الإلكتروني':'اسم المستخدم أو البريد الإلكتروني';
-  if(el('authEmail')) el('authEmail').placeholder=reg?'mmtofik9@gmail.com':'TOUFIK_GAMER';
-  if(el('authEmail')) el('authEmail').type=reg?'email':'text';
-  if(el('authPassword')) el('authPassword').placeholder='password';
-  if(el('authSubmit')) el('authSubmit').textContent=reg?'إنشاء الحساب':'تسجيل الدخول';
-  if(el('authSwitch')) el('authSwitch').textContent=reg?'لديك حساب؟ تسجيل الدخول':'ليس لديك حساب؟ إنشاء حساب';
-  if(el('authMsg')) el('authMsg').textContent='';
-}
-async function submitAuth(){
-  const msg=el('authMsg'); msg.style.color=''; msg.textContent='جاري المعالجة...';
-  const body={login:el('authEmail').value.trim(),email:el('authEmail').value.trim(),password:el('authPassword').value};
-  if(authMode==='register') body.username=el('authUsername').value.trim();
-  try{
-    const r=await fetch('/api/auth/'+(authMode==='register'?'register':'login'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    let data={}; try{data=await r.json();}catch{}
-    if(!r.ok) throw new Error(data.error||'تعذر الاتصال بالخادم. تأكد أن Backend يعمل.');
-    localStorage.setItem('m5kToken',data.token); localStorage.setItem('m5kPlayerName',data.user.username); updateAccountUI(); msg.textContent='تم بنجاح ✅'; setTimeout(()=>show('home'),500);
-  }catch(e){msg.textContent=(e instanceof TypeError?'تعذر تنفيذ العملية حاليًا. حاول مرة أخرى.':e.message);msg.style.color='#fb7185';}
-}
-function updateAccountUI(){
-  const token=localStorage.getItem('m5kToken'); const status=el('accountStatus'), btn=document.querySelector('.account-btn');
-  if(token){ const n=localStorage.getItem('m5kPlayerName')||'لاعب'; if(status) status.textContent='👤 '+n; if(btn){btn.textContent='تسجيل الخروج';btn.onclick=logout;}}
-  else {if(status) status.textContent='زائر';if(btn){btn.textContent='تسجيل الدخول';btn.onclick=()=>openAuth('login');}}
-}
-function logout(){localStorage.removeItem('m5kToken');updateAccountUI();}
 
 function escapeHtml(value){
   return String(value).replace(/[&<>"']/g, ch => ({
