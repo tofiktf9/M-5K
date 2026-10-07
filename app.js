@@ -1356,7 +1356,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const saved = localStorage.getItem("m5kPlayerName") || "";
   if(el("playerName")) el("playerName").value = saved;
   updateHintButton();
-  updateAccountUI();
   refreshFriendsLive();
   setInterval(refreshFriendsLive, 3000);
   window.addEventListener("beforeunload", leaveFriendsHeartbeat);
