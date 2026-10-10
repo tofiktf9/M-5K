@@ -1,6 +1,8 @@
+-- إنشاء قاعدة البيانات إن لم تكن موجودة
 CREATE DATABASE IF NOT EXISTS m5k CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE m5k;
 
+-- جدول المستخدمين (لحفظ الحسابات، الأسماء الفريدة، وكلمات المرور المشفرة وإحصائيات اللعب)
 CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(30) NOT NULL UNIQUE,
@@ -14,6 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
   INDEX idx_best_score (best_score)
 ) ENGINE=InnoDB;
 
+-- جدول نتائج الألعاب (لحفظ نتائج كل جولة، الغرف الجماعية، وترتيب المتصدرين بدقة)
 CREATE TABLE IF NOT EXISTS game_results (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   user_id INT UNSIGNED NOT NULL,
