@@ -1,3 +1,13 @@
+const API_BASE = 'https://m5k.onrender.com';
+
+const originalFetch = window.fetch.bind(window);
+
+window.fetch = (input, init) => {
+  if (typeof input === 'string' && input.startsWith('/api/')) {
+    input = API_BASE + input;
+  }
+  return originalFetch(input, init);
+};
 
 const ID_ALIASES = {
   questionNumber: ["questionNumber", "qNumber", "counter"],
@@ -1321,49 +1331,20 @@ function updateStats(){
 
 async function updateLeaders(){
   const board=document.querySelector('.leaderboard'); if(!board) return;
-  board.innerHTML='<p>جاري تحميل المتصدرين...</p>';
   try{
     const r=await fetch('/api/leaderboard');
-    if(!r.ok) throw new Error('تعذر تحميل المتصدرين من الخادم.');
-    const data=await r.json(); const rows=data.players||[];
+    if(!r.ok) throw new Error();
+    const data=await r.json();
+    const rows=data.players||[];
     if(rows.length){ board.innerHTML=rows.slice(0,10).map((r,i)=>`<div class="leader ${i===0?'first':''} ${i===1?'second':''} ${i===2?'third':''}"><b class="leader-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</b><i>${escapeHtml((r.username||'ل').charAt(0))}</i><span>${escapeHtml(r.username)}</span><strong>${Number(r.best_score)||0}</strong></div>`).join(''); }
     else board.innerHTML='<p>لا توجد نتائج عالمية بعد. سجّل حسابًا والعب أول جولة!</p>';
-  }catch(e){ board.innerHTML='<p>تعذر الاتصال بالمتصدرين. تحقق من اتصال الموقع بالخادم ثم أعد المحاولة.</p>'; }
+  }catch(e){
+    const history=JSON.parse(localStorage.getItem('m5kHistory')||'[]'); const best={}; history.forEach(x=>best[x.name]=Math.max(best[x.name]||0,Number(x.score)||0));
+    const rows=Object.entries(best).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    board.innerHTML=rows.length?rows.map((r,i)=>`<div class="leader ${i===0?'first':''} ${i===1?'second':''} ${i===2?'third':''}"><b class="leader-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</b><i>${escapeHtml((r[0]||'ل').charAt(0))}</i><span>${escapeHtml(r[0])}</span><strong>${r[1]}</strong></div>`).join(''):'<p>العب أول جولة لتظهر نتائجك هنا.</p>';
+  }
 }
 
-let authMode='login';
-function openAuth(mode='login'){authMode=mode; show('auth'); renderAuth();}
-function toggleAuthMode(){authMode=authMode==='login'?'register':'login';renderAuth();}
-function renderAuth(){
-  const reg=authMode==='register';
-  if(el('authTitle')) el('authTitle').textContent=reg?'إنشاء حساب':'تسجيل الدخول';
-  if(el('authSubtitle')) el('authSubtitle').textContent=reg?'أنشئ حسابًا واحفظ نتائجك في المتصدرين العالميين.':'سجّل دخولك لحفظ نتائجك في المتصدرين العالميين.';
-  if(el('authUsernameWrap')) el('authUsernameWrap').style.display=reg?'block':'none';
-  if(el('authLoginLabel')) el('authLoginLabel').textContent=reg?'البريد الإلكتروني':'اسم المستخدم أو البريد الإلكتروني';
-  if(el('authEmail')) el('authEmail').placeholder=reg?'mmtofik9@gmail.com':'TOUFIK_GAMER';
-  if(el('authEmail')) el('authEmail').type=reg?'email':'text';
-  if(el('authPassword')) el('authPassword').placeholder='password';
-  if(el('authSubmit')) el('authSubmit').textContent=reg?'إنشاء الحساب':'تسجيل الدخول';
-  if(el('authSwitch')) el('authSwitch').textContent=reg?'لديك حساب؟ تسجيل الدخول':'ليس لديك حساب؟ إنشاء حساب';
-  if(el('authMsg')) el('authMsg').textContent='';
-}
-async function submitAuth(){
-  const msg=el('authMsg'); msg.style.color=''; msg.textContent='جاري المعالجة...';
-  const body={login:el('authEmail').value.trim(),email:el('authEmail').value.trim(),password:el('authPassword').value};
-  if(authMode==='register') body.username=el('authUsername').value.trim();
-  try{
-    const r=await fetch('/api/auth/'+(authMode==='register'?'register':'login'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    let data={}; try{data=await r.json();}catch{}
-    if(!r.ok) throw new Error(data.error||'تعذر الاتصال بالخادم. تأكد أن Backend يعمل.');
-    localStorage.setItem('m5kToken',data.token); localStorage.setItem('m5kPlayerName',data.user.username); updateAccountUI(); msg.textContent='تم بنجاح ✅'; setTimeout(()=>show('home'),500);
-  }catch(e){msg.textContent=(e instanceof TypeError?'تعذر تنفيذ العملية حاليًا. حاول مرة أخرى.':e.message);msg.style.color='#fb7185';}
-}
-function updateAccountUI(){
-  const token=localStorage.getItem('m5kToken'); const status=el('accountStatus'), btn=document.querySelector('.account-btn');
-  if(token){ const n=localStorage.getItem('m5kPlayerName')||'لاعب'; if(status) status.textContent='👤 '+n; if(btn){btn.textContent='تسجيل الخروج';btn.onclick=logout;}}
-  else {if(status) status.textContent='زائر';if(btn){btn.textContent='تسجيل الدخول';btn.onclick=()=>openAuth('login');}}
-}
-function logout(){localStorage.removeItem('m5kToken');updateAccountUI();}
 
 function escapeHtml(value){
   return String(value).replace(/[&<>"']/g, ch => ({
@@ -1375,7 +1356,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const saved = localStorage.getItem("m5kPlayerName") || "";
   if(el("playerName")) el("playerName").value = saved;
   updateHintButton();
-  updateAccountUI();
   refreshFriendsLive();
   setInterval(refreshFriendsLive, 3000);
   window.addEventListener("beforeunload", leaveFriendsHeartbeat);
@@ -1463,14 +1443,14 @@ function createOnlineFriendRoom(){
   setupOnlineSocketHandlers();
   const name=friendOnlineName(), qCount=Number(el('friendQCount')?.value)||15;
   localStorage.setItem('m5kPlayerName',name);
-  const token=localStorage.getItem('m5kToken'); if(!token){onlineMsg('⚠️ سجّل الدخول أولًا حتى تُحفظ نتيجتك.','#fb7185');openAuth('login');return;} onlineFriendSocket.emit('room:create',{name,qCount,token});
+  onlineFriendSocket.emit('room:create',{name,qCount});
 }
 function joinOnlineFriendRoom(){
   if(!onlineSocketReady()) return;
   setupOnlineSocketHandlers();
   const name=friendOnlineName(), code=String(el('friendRoomCode')?.value||'').trim().toUpperCase();
   if(!/^[A-Z0-9]{5,6}$/.test(code)){onlineMsg('⚠️ اكتب كود غرفة صحيحًا.','#fb7185');return;}
-  const token=localStorage.getItem('m5kToken'); if(!token){onlineMsg('⚠️ سجّل الدخول أولًا حتى تُحفظ نتيجتك.','#fb7185');openAuth('login');return;} localStorage.setItem('m5kPlayerName',name); onlineFriendSocket.emit('room:join',{code,name,token});
+  localStorage.setItem('m5kPlayerName',name); onlineFriendSocket.emit('room:join',{code,name});
 }
 function renderOnlineLobby(data){
   const list=el('onlinePlayerList'); if(!list)return;
