@@ -9,7 +9,6 @@ const jwt = require('jsonwebtoken');
 const http = require('http');
 const { Server } = require('socket.io');
 const { initStore } = require('./store');
-const nodemailer = require('nodemailer');
 
 const ROOT = path.join(__dirname, '..');
 const DATA_DIR = path.join(__dirname, 'data');
@@ -127,26 +126,32 @@ app.post('/api/auth/login', authLimit, wrap(async (req, res) => {
 
 const resetCodes = new Map();
 const resetLimit = limiter(4, 15 * 60 * 1000);
-function mailer(){
-  if(!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) return null;
-  return nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT||587),secure:String(process.env.SMTP_SECURE||'false')==='true',auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS},connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000});
+async function sendResetEmail(email, code){
+  const apiKey=process.env.RESEND_API_KEY;
+  const from=process.env.RESEND_FROM;
+  if(!apiKey || !from) return false;
+  const html=`<div dir="rtl" style="font-family:Arial,sans-serif"><h2>تغيير كلمة مرور M5K</h2><p>رمز التحقق الخاص بك:</p><p style="font-size:30px;font-weight:bold;letter-spacing:6px">${code}</p><p>صلاحية الرمز 10 دقائق. لا تشاركه مع أحد.</p></div>`;
+  const response=await fetch('https://api.resend.com/emails',{
+    method:'POST',
+    headers:{'Authorization':`Bearer ${apiKey}`,'Content-Type':'application/json'},
+    body:JSON.stringify({from,to:[email],subject:'رمز تغيير كلمة مرور M5K',text:`رمز التحقق لتغيير كلمة مرور حسابك في M5K هو: ${code}\nصلاحية الرمز 10 دقائق. إذا لم تطلب ذلك فتجاهل الرسالة.`,html})
+  });
+  if(!response.ok){
+    const detail=await response.text().catch(()=> '');
+    console.error('[password-reset] Resend API failed:',response.status,detail.slice(0,500));
+    throw new Error('تعذر إرسال رسالة التحقق عبر خدمة البريد. تحقق من إعدادات Resend.');
+  }
+  return true;
 }
 app.post('/api/auth/forgot-password', resetLimit, wrap(async (req,res)=>{
   const email=cleanEmail(req.body.email);
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({error:'اكتب البريد الإلكتروني الصحيح الذي سجلت به.'});
-  const transport=mailer();
-  if(!transport) return res.status(503).json({error:'خدمة إرسال البريد غير مهيأة بعد. أضف إعدادات SMTP في Render لإرسال رموز التحقق.'});
+  if(!process.env.RESEND_API_KEY || !process.env.RESEND_FROM) return res.status(503).json({error:'خدمة البريد غير مهيأة بعد. أضف RESEND_API_KEY وRESEND_FROM في Render.'});
   const user=await store.getUserByEmail(email);
   if(user){
     const code=String(crypto.randomInt(100000,1000000));
     resetCodes.set(email,{userId:user.id,hash:crypto.createHash('sha256').update(code).digest('hex'),expires:Date.now()+10*60*1000,attempts:0});
-    try {
-      await transport.sendMail({from:process.env.SMTP_FROM||process.env.SMTP_USER,to:email,subject:'رمز تغيير كلمة مرور M5K',text:`رمز التحقق لتغيير كلمة مرور حسابك في M5K هو: ${code}\nصلاحية الرمز 10 دقائق. إذا لم تطلب ذلك فتجاهل الرسالة.`,html:`<div dir="rtl" style="font-family:Arial,sans-serif"><h2>تغيير كلمة مرور M5K</h2><p>رمز التحقق الخاص بك:</p><p style="font-size:30px;font-weight:bold;letter-spacing:6px">${code}</p><p>صلاحية الرمز 10 دقائق. لا تشاركه مع أحد.</p></div>`});
-    } catch (mailError) {
-      resetCodes.delete(email);
-      console.error('[password-reset] SMTP send failed:', mailError && (mailError.code || mailError.message) || 'unknown error');
-      return res.status(502).json({error:'تعذر إرسال البريد. تحقق من إعدادات SMTP في Render ثم راجع Logs.'});
-    }
+    await sendResetEmail(email,code);
   }
   res.json({ok:true,message:'إذا كان البريد مسجلًا، فسيصلك رمز تحقق خلال لحظات.'});
 }));

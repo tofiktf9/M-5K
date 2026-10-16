@@ -1,6 +1,6 @@
 {
   "name": "m5k-backend",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
   "engines": {
     "node": ">=18"
@@ -15,7 +15,6 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.5",
-    "socket.io": "^4.8.1",
-    "nodemailer": "^6.9.16"
+    "socket.io": "^4.8.1"
   }
 }
