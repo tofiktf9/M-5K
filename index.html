@@ -212,7 +212,7 @@
 
     <section id="profile" class="page"><div class="center-head"><span class="eyebrow">👤 حسابك</span><h1>الملف الشخصي</h1><p>ملخص حسابك وتقدمك في التحديات.</p></div><div class="panel account-panel"><div class="profile-avatar" id="profileAvatar">M</div><label class="avatar-upload-btn" for="avatarFileInput">📷 تغيير الصورة</label><input id="avatarFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden onchange="uploadAvatar(event)"><p id="avatarUploadMsg" class="muted" aria-live="polite"></p><h2 id="profileUsername">زائر</h2><p id="profileEmail" class="muted">سجّل الدخول لمزامنة حسابك.</p><div class="profile-stats"><div><b id="accountGames">0</b><span>جولات</span></div><div><b id="accountBest">0</b><span>أفضل نتيجة</span></div><div><b id="accountPoints">0</b><span>إجمالي النقاط</span></div></div><button class="primary" onclick="openAuth('login')" id="profileLogin">تسجيل الدخول / إنشاء حساب</button><button class="secondary" onclick="show('settings')">إعدادات الحساب</button></div></section>
     <section id="settings" class="page"><div class="center-head"><span class="eyebrow">⚙️ تخصيص</span><h1>الإعدادات</h1><p>اختر المظهر واللغة التي تفضّلها.</p></div><div class="panel settings-panel"><label>المظهر<select id="themeSetting" class="contact-input" onchange="savePreferences()"><option value="dark">داكن</option><option value="midnight">منتصف الليل</option><option value="light">فاتح</option></select></label><label>لغة الواجهة<select id="languageSetting" class="contact-input" onchange="savePreferences()"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option></select></label><p id="settingsMessage" class="answer-msg" role="status"></p><p class="muted">تُحفظ إعداداتك في حسابك عبر الإنترنت. سجّل الدخول لمزامنة اختياراتك بين أجهزتك.</p></div></section>
-    <section id="faq" class="page"><div class="center-head"><span class="eyebrow">❓ المساعدة</span><h1>الأسئلة الشائعة — FAQs</h1><p>إجابات سريعة عن الحسابات والألعاب.</p></div><div class="faq-list"><details><summary>كيف أنشئ حسابًا؟</summary><p>اضغط «تسجيل الدخول» ثم اختر إنشاء حساب. استخدم بريدًا صالحًا وكلمة مرور قوية من 10 أحرف على الأقل.</p></details><details><summary>هل تُحفظ نتائجي؟</summary><p>نعم، تُحفظ نتائج الحسابات على الخادم. للاستضافة الإنتاجية استخدم قاعدة بيانات دائمة ولا تعتمد على ملفات مؤقتة.</p></details><details><summary>كيف أغيّر اللغة أو المظهر؟</summary><p>افتح صفحة الإعدادات واختر اللغة أو المظهر. العربية والإنجليزية والفرنسية متاحة، مع دعم الواجهة الأساسية.</p></details><details><summary>هل أستطيع اللعب مع الأصدقاء؟</summary><p>نعم، من صفحة الألعاب اختر تحدي الأصدقاء أونلاين وأنشئ غرفة وشارك رمزها.</p></details><details><summary>نسيت كلمة المرور، ماذا أفعل؟</summary><p>استعادة كلمة المرور عبر البريد غير مفعّلة بعد؛ يلزم إضافة مزود بريد والتحقق من العناوين.</p></details><details><summary>كيف أتواصل مع فريق الموقع؟</summary><p>افتح صفحة «تواصل معنا» وأرسل اقتراحك أو بلاغك.</p></details></div></section>
+    <section id="faq" class="page"><div class="center-head"><span class="eyebrow">❓ المساعدة</span><h1>الأسئلة الشائعة — FAQs</h1><p>إجابات سريعة عن الحسابات والألعاب.</p></div><div class="faq-list"><details><summary>كيف أنشئ حسابًا؟</summary><p>اضغط «تسجيل الدخول» ثم اختر إنشاء حساب. استخدم بريدًا صالحًا وكلمة مرور قوية من 10 أحرف على الأقل.</p></details><details><summary>هل تُحفظ نتائجي؟</summary><p>نعم، تُحفظ نتائج الحسابات على الخادم. للاستضافة الإنتاجية استخدم قاعدة بيانات دائمة ولا تعتمد على ملفات مؤقتة.</p></details><details><summary>كيف أغيّر اللغة أو المظهر؟</summary><p>افتح صفحة الإعدادات واختر اللغة أو المظهر. العربية والإنجليزية والفرنسية متاحة، مع دعم الواجهة الأساسية.</p></details><details><summary>هل أستطيع اللعب مع الأصدقاء؟</summary><p>نعم، من صفحة الألعاب اختر تحدي الأصدقاء أونلاين وأنشئ غرفة وشارك رمزها.</p></details><details><summary>نسيت كلمة المرور، ماذا أفعل؟</summary><p>من صفحة تسجيل الدخول اختر «إعادة تعيين الرقم السري»، أدخل البريد المسجل، ثم رمز التحقق الذي يصلك لتعيين كلمة مرور جديدة.</p></details><details><summary>كيف أتواصل مع فريق الموقع؟</summary><p>افتح صفحة «تواصل معنا» وأرسل اقتراحك أو بلاغك.</p></details></div></section>
 
     <section id="auth" class="page">
       <div class="panel form-panel auth-panel">
@@ -230,6 +230,27 @@
         <button class="primary full" id="authSubmit" onclick="submitAuth()">تسجيل الدخول</button>
         <button class="auth-switch" id="authSwitch" onclick="toggleAuthMode()">ليس لديك حساب؟ سجل الآن</button>
         <p id="authMsg" class="answer-msg" role="status"></p>
+      </div>
+    </section>
+
+    <section id="passwordReset" class="page">
+      <div class="panel form-panel auth-panel">
+        <a class="auth-brand" href="#" onclick="show('home');return false;">M5K</a>
+        <h1>استعادة كلمة المرور</h1>
+        <p>أدخل البريد الإلكتروني الذي سجلت به حسابك، ثم استخدم رمز التحقق الذي يصلك لتعيين كلمة مرور جديدة.</p>
+        <div id="resetEmailStep">
+          <label>البريد الإلكتروني المسجل<input id="resetEmail" type="email" maxlength="190" placeholder="example@gmail.com" autocomplete="email" required></label>
+          <button class="primary full" id="sendResetCodeBtn" type="button" onclick="sendPasswordResetCode()">إرسال رمز التحقق</button>
+        </div>
+        <div id="resetCodeStep" style="display:none">
+          <label>رمز التحقق (6 أرقام)<input id="resetCode" class="code-input" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" autocomplete="one-time-code"></label>
+          <label>كلمة المرور الجديدة<input id="resetNewPassword" type="password" minlength="10" maxlength="100" placeholder="10 أحرف على الأقل" autocomplete="new-password"></label>
+          <label>تأكيد كلمة المرور الجديدة<input id="resetConfirmPassword" type="password" minlength="10" maxlength="100" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password"></label>
+          <button class="primary full" id="confirmResetBtn" type="button" onclick="finishPasswordReset()">تغيير كلمة المرور</button>
+          <button class="auth-switch" type="button" onclick="resendPasswordResetCode()">إعادة إرسال الرمز</button>
+        </div>
+        <p id="resetMsg" class="answer-msg" role="status" aria-live="polite"></p>
+        <button class="auth-switch" type="button" onclick="openAuth('login')">العودة إلى تسجيل الدخول</button>
       </div>
     </section>
 
