@@ -1537,15 +1537,21 @@ async function sendPasswordResetCode(){
   const btn=el('sendResetCodeBtn'); if(btn){btn.disabled=true;btn.textContent='جارٍ إرسال الرمز...';}
   resetMessage('جارٍ طلب رمز التحقق...');
   try{
-    const r=await fetch('/api/auth/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),25000);
+    let r;
+    try { r=await fetch('/api/auth/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email}),signal:controller.signal}); }
+    finally { clearTimeout(timeout); }
     const data=await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(data.error||'تعذر إرسال رمز التحقق.');
     if(el('resetEmailStep')) el('resetEmailStep').style.display='none';
     if(el('resetCodeStep')) el('resetCodeStep').style.display='block';
     resetMessage('إذا كان البريد مسجلًا، فسيصلك رمز من 6 أرقام. افحص الوارد ومجلد الرسائل غير المرغوب فيها (Spam). الرمز صالح لمدة 10 دقائق.');
     el('resetCode')?.focus();
-  }catch(e){resetMessage(e.message||'تعذر إرسال رمز التحقق. تأكد من إعداد البريد في الخادم.',true);}
-  finally{if(btn){btn.disabled=false;btn.textContent='إرسال رمز التحقق';}}
+  }catch(e){
+    const message=e.name==='AbortError'?'انتهت مهلة انتظار الخادم. لم يصل رد من Render خلال 25 ثانية؛ افتح Render ثم Logs لمعرفة السبب.':(e.message||'تعذر إرسال رمز التحقق. تأكد من إعداد البريد في الخادم.');
+    resetMessage(message,true);
+  }finally{if(btn){btn.disabled=false;btn.textContent='إرسال رمز التحقق';}}
 }
 async function resendPasswordResetCode(){
   if(el('resetCodeStep')) el('resetCodeStep').style.display='none';

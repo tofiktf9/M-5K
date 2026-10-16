@@ -129,7 +129,7 @@ const resetCodes = new Map();
 const resetLimit = limiter(4, 15 * 60 * 1000);
 function mailer(){
   if(!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) return null;
-  return nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT||587),secure:String(process.env.SMTP_SECURE||'false')==='true',auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS}});
+  return nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT||587),secure:String(process.env.SMTP_SECURE||'false')==='true',auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS},connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000});
 }
 app.post('/api/auth/forgot-password', resetLimit, wrap(async (req,res)=>{
   const email=cleanEmail(req.body.email);
@@ -140,7 +140,13 @@ app.post('/api/auth/forgot-password', resetLimit, wrap(async (req,res)=>{
   if(user){
     const code=String(crypto.randomInt(100000,1000000));
     resetCodes.set(email,{userId:user.id,hash:crypto.createHash('sha256').update(code).digest('hex'),expires:Date.now()+10*60*1000,attempts:0});
-    await transport.sendMail({from:process.env.SMTP_FROM||process.env.SMTP_USER,to:email,subject:'رمز تغيير كلمة مرور M5K',text:`رمز التحقق لتغيير كلمة مرور حسابك في M5K هو: ${code}\nصلاحية الرمز 10 دقائق. إذا لم تطلب ذلك فتجاهل الرسالة.`,html:`<div dir="rtl" style="font-family:Arial,sans-serif"><h2>تغيير كلمة مرور M5K</h2><p>رمز التحقق الخاص بك:</p><p style="font-size:30px;font-weight:bold;letter-spacing:6px">${code}</p><p>صلاحية الرمز 10 دقائق. لا تشاركه مع أحد.</p></div>`});
+    try {
+      await transport.sendMail({from:process.env.SMTP_FROM||process.env.SMTP_USER,to:email,subject:'رمز تغيير كلمة مرور M5K',text:`رمز التحقق لتغيير كلمة مرور حسابك في M5K هو: ${code}\nصلاحية الرمز 10 دقائق. إذا لم تطلب ذلك فتجاهل الرسالة.`,html:`<div dir="rtl" style="font-family:Arial,sans-serif"><h2>تغيير كلمة مرور M5K</h2><p>رمز التحقق الخاص بك:</p><p style="font-size:30px;font-weight:bold;letter-spacing:6px">${code}</p><p>صلاحية الرمز 10 دقائق. لا تشاركه مع أحد.</p></div>`});
+    } catch (mailError) {
+      resetCodes.delete(email);
+      console.error('[password-reset] SMTP send failed:', mailError && (mailError.code || mailError.message) || 'unknown error');
+      return res.status(502).json({error:'تعذر إرسال البريد. تحقق من إعدادات SMTP في Render ثم راجع Logs.'});
+    }
   }
   res.json({ok:true,message:'إذا كان البريد مسجلًا، فسيصلك رمز تحقق خلال لحظات.'});
 }));
