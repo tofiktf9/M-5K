@@ -1805,24 +1805,3 @@ async function shareGameResult(){
   try{if(navigator.share){await navigator.share({title:'نتيجتي في مِخّك',text,url:location.origin});return;}if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(`${text}\n${location.origin}`);alert('تم نسخ نتيجتك ورابط الموقع، شاركهما مع أصدقائك!');return;}prompt('انسخ نتيجتك وشاركها مع أصدقائك:',`${text}\n${location.origin}`);}catch(e){if(e&&e.name!=='AbortError')alert('تعذرت المشاركة الآن. حاول مرة أخرى.');}
 }
 
-function startTikTokLogin(){
-  window.location.assign('/auth/tiktok');
-}
-
-// TikTok returns the short-lived M5K session token in the URL fragment.
-// Fragments are not sent in HTTP requests; remove it immediately after storing.
-(function consumeTikTokReturn(){
-  if(!location.hash) return;
-  const params=new URLSearchParams(location.hash.slice(1));
-  const token=params.get('tiktok_token');
-  const error=params.get('tiktok_error');
-  if(token){
-    localStorage.setItem('m5kToken',token);
-    history.replaceState(null,document.title,location.pathname+location.search);
-    restoreSession().then(()=>{renderHeaderAccount();show('home');});
-  }else if(error){
-    history.replaceState(null,document.title,location.pathname+location.search);
-    const messages={cancelled:'تم إلغاء تسجيل الدخول عبر TikTok.',failed:'تعذر التحقق من حساب TikTok. تأكد من إعدادات التطبيق.',profile:'تعذر جلب بيانات حساب TikTok.',account:'تعذر إنشاء حساب M5K عبر TikTok.'};
-    setTimeout(()=>{const msg=el('authMsg');if(msg){msg.style.color='#fb7185';msg.textContent=messages[error]||'تعذر تسجيل الدخول عبر TikTok.';}openAuth('login');},0);
-  }
-})();
