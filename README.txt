@@ -40,3 +40,6 @@ M5K Backend v2: أضيف نظام تحدي الأصدقاء أونلاين با�
 
 
 تسجيل الدخول في هذه النسخة يستخدم البريد الإلكتروني وكلمة المرور فقط. تم حذف تسجيل TikTok ومسارات OAuth المرتبطة به.
+
+
+Version v40: Removed the password reset link, page, frontend handlers, and backend password-reset endpoints as requested. Password recovery is not available in this version.

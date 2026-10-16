@@ -1496,7 +1496,6 @@ function renderAuth(){
   if(el('authSubtitle')) el('authSubtitle').textContent=reg?'أنشئ حسابك وابدأ بحفظ نتائجك وإنجازاتك.':'سجّل الدخول لمتابعة ألعابك وحفظ تقدمك.';
   el('authLoginTab')?.classList.toggle('active',!reg);
   el('authRegisterTab')?.classList.toggle('active',reg);
-  if(el('forgotPasswordLink')) el('forgotPasswordLink').style.display=reg?'none':'block';
   if(el('authUsernameWrap')) el('authUsernameWrap').style.display=reg?'block':'none';
   if(el('authLoginLabel')) el('authLoginLabel').textContent=reg?'البريد الإلكتروني':'اسم المستخدم أو البريد الإلكتروني';
   if(el('authEmail')) el('authEmail').placeholder=reg?'example@gmail.com':'TOUFIK_GAMER';
@@ -1517,62 +1516,6 @@ async function submitAuth(){
     setSession(data.token,data.user); updateAccountUI(); if(el('authPassword')) el('authPassword').value=''; msg.textContent='تم بنجاح ✅'; setTimeout(()=>show('home'),500);
   }catch(e){msg.textContent=(e instanceof TypeError?'تعذر تنفيذ العملية حاليًا. حاول مرة أخرى.':e.message);msg.style.color='#fb7185';}
 }
-function startPasswordReset(){
-  const currentEmail=el('authEmail')?.value.trim()||'';
-  show('passwordReset');
-  if(el('resetEmail')) el('resetEmail').value=currentEmail.includes('@')?currentEmail:'';
-  if(el('resetEmailStep')) el('resetEmailStep').style.display='block';
-  if(el('resetCodeStep')) el('resetCodeStep').style.display='none';
-  if(el('resetMsg')) {el('resetMsg').textContent='';el('resetMsg').style.color='';}
-  if(el('resetCode')) el('resetCode').value='';
-  if(el('resetNewPassword')) el('resetNewPassword').value='';
-  if(el('resetConfirmPassword')) el('resetConfirmPassword').value='';
-}
-function resetMessage(message,error=false){
-  const msg=el('resetMsg'); if(msg){msg.textContent=message;msg.style.color=error?'#fb7185':'';}
-}
-async function sendPasswordResetCode(){
-  const email=el('resetEmail')?.value.trim()||'';
-  if(!email||! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){resetMessage('اكتب البريد الإلكتروني الصحيح الذي سجلت به حسابك.',true);return;}
-  const btn=el('sendResetCodeBtn'); if(btn){btn.disabled=true;btn.textContent='جارٍ إرسال الرمز...';}
-  resetMessage('جارٍ طلب رمز التحقق...');
-  try{
-    const r=await fetch('/api/auth/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
-    const data=await r.json().catch(()=>({}));
-    if(!r.ok) throw new Error(data.error||'تعذر إرسال رمز التحقق.');
-    if(el('resetEmailStep')) el('resetEmailStep').style.display='none';
-    if(el('resetCodeStep')) el('resetCodeStep').style.display='block';
-    resetMessage('إذا كان البريد مسجلًا، فسيصلك رمز من 6 أرقام. افحص الوارد ومجلد الرسائل غير المرغوب فيها (Spam). الرمز صالح لمدة 10 دقائق.');
-    el('resetCode')?.focus();
-  }catch(e){resetMessage(e.message||'تعذر إرسال رمز التحقق. تأكد من إعداد البريد في الخادم.',true);}
-  finally{if(btn){btn.disabled=false;btn.textContent='إرسال رمز التحقق';}}
-}
-async function resendPasswordResetCode(){
-  if(el('resetCodeStep')) el('resetCodeStep').style.display='none';
-  if(el('resetEmailStep')) el('resetEmailStep').style.display='block';
-  resetMessage('يمكنك طلب رمز جديد. إذا كان الرمز السابق ما زال صالحًا، استخدم الأحدث الذي يصلك.');
-}
-async function finishPasswordReset(){
-  const email=el('resetEmail')?.value.trim()||'';
-  const code=el('resetCode')?.value.trim()||'';
-  const password=el('resetNewPassword')?.value||'';
-  const confirm=el('resetConfirmPassword')?.value||'';
-  if(!/^[0-9]{6}$/.test(code)){resetMessage('أدخل رمز التحقق المكوّن من 6 أرقام.',true);return;}
-  if(password.length<10||password.length>100){resetMessage('كلمة المرور يجب أن تكون بين 10 و100 حرف.',true);return;}
-  if(password!==confirm){resetMessage('كلمتا المرور غير متطابقتين.',true);return;}
-  const btn=el('confirmResetBtn'); if(btn){btn.disabled=true;btn.textContent='جارٍ تغيير كلمة المرور...';}
-  resetMessage('جارٍ التحقق من الرمز وتغيير كلمة المرور...');
-  try{
-    const r=await fetch('/api/auth/reset-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,code,password})});
-    const data=await r.json().catch(()=>({}));
-    if(!r.ok) throw new Error(data.error||'تعذر تغيير كلمة المرور.');
-    resetMessage('تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.');
-    if(el('resetCodeStep')) el('resetCodeStep').style.display='none';
-    setTimeout(()=>openAuth('login'),1200);
-  }catch(e){resetMessage(e.message||'تعذر تغيير كلمة المرور.',true);}
-  finally{if(btn){btn.disabled=false;btn.textContent='تغيير كلمة المرور';}}
-}
-
 function updateAccountUI(){
   const token=getToken(); const status=el('accountStatus'), btn=document.querySelector('.account-btn');
   if(token){

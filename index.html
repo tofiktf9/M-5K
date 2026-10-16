@@ -226,35 +226,12 @@
         <label id="authUsernameWrap" style="display:none">اسم المستخدم<input id="authUsername" maxlength="30" placeholder="اسم المستخدم" autocomplete="username"></label>
         <label><span id="authLoginLabel">البريد الإلكتروني</span><input id="authEmail" type="email" maxlength="190" placeholder="example@gmail.com" autocomplete="email"></label>
         <label><span>الرقم السري / الباسوورد</span><input id="authPassword" type="password" maxlength="100" placeholder="كلمة المرور" autocomplete="current-password"></label>
-        <a class="forgot-password-link" id="forgotPasswordLink" href="#" onclick="event.preventDefault();startPasswordReset()">إعادة تعيين الرقم السري</a>
-        <button class="primary full" id="authSubmit" onclick="submitAuth()">تسجيل الدخول</button>
+<button class="primary full" id="authSubmit" onclick="submitAuth()">تسجيل الدخول</button>
         <button class="auth-switch" id="authSwitch" onclick="toggleAuthMode()">ليس لديك حساب؟ سجل الآن</button>
         <p id="authMsg" class="answer-msg" role="status"></p>
       </div>
     </section>
-
-    <section id="passwordReset" class="page">
-      <div class="panel form-panel auth-panel">
-        <a class="auth-brand" href="#" onclick="show('home');return false;">M5K</a>
-        <h1>استعادة كلمة المرور</h1>
-        <p>أدخل البريد الإلكتروني الذي سجلت به حسابك، ثم استخدم رمز التحقق الذي يصلك لتعيين كلمة مرور جديدة.</p>
-        <div id="resetEmailStep">
-          <label>البريد الإلكتروني المسجل<input id="resetEmail" type="email" maxlength="190" placeholder="example@gmail.com" autocomplete="email" required></label>
-          <button class="primary full" id="sendResetCodeBtn" type="button" onclick="sendPasswordResetCode()">إرسال رمز التحقق</button>
-        </div>
-        <div id="resetCodeStep" style="display:none">
-          <label>رمز التحقق (6 أرقام)<input id="resetCode" class="code-input" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" autocomplete="one-time-code"></label>
-          <label>كلمة المرور الجديدة<input id="resetNewPassword" type="password" minlength="10" maxlength="100" placeholder="10 أحرف على الأقل" autocomplete="new-password"></label>
-          <label>تأكيد كلمة المرور الجديدة<input id="resetConfirmPassword" type="password" minlength="10" maxlength="100" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password"></label>
-          <button class="primary full" id="confirmResetBtn" type="button" onclick="finishPasswordReset()">تغيير كلمة المرور</button>
-          <button class="auth-switch" type="button" onclick="resendPasswordResetCode()">إعادة إرسال الرمز</button>
-        </div>
-        <p id="resetMsg" class="answer-msg" role="status" aria-live="polite"></p>
-        <button class="auth-switch" type="button" onclick="openAuth('login')">العودة إلى تسجيل الدخول</button>
-      </div>
-    </section>
-
-    <section id="quiz" class="page">
+<section id="quiz" class="page">
       <div class="quiz-top"><span id="qNumber">السؤال 1 / 10</span><div class="timer"><span id="timer">15</span></div><span>النقاط: <b id="scoreNow">0</b></span><div class="quiz-actions"><button class="hint-btn" onclick="useNextHint()">🔮 تلميح (1)</button><button class="exit-game-btn" onclick="requestExitGame()">🚪 خروج</button></div></div>
       <div class="progress"><i id="progress"></i></div>
       <div class="quiz-box"><span class="category-tag" id="qCat">منوعات</span><h1 id="questionText">...</h1><div id="answers" class="answers"></div></div>

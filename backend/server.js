@@ -124,51 +124,6 @@ app.post('/api/auth/login', authLimit, wrap(async (req, res) => {
 }));
 
 
-const resetCodes = new Map();
-const resetLimit = limiter(4, 15 * 60 * 1000);
-async function sendResetEmail(email, code){
-  const apiKey=process.env.RESEND_API_KEY;
-  const from=process.env.RESEND_FROM;
-  if(!apiKey || !from) return false;
-  const html=`<div dir="rtl" style="font-family:Arial,sans-serif"><h2>تغيير كلمة مرور M5K</h2><p>رمز التحقق الخاص بك:</p><p style="font-size:30px;font-weight:bold;letter-spacing:6px">${code}</p><p>صلاحية الرمز 10 دقائق. لا تشاركه مع أحد.</p></div>`;
-  const response=await fetch('https://api.resend.com/emails',{
-    method:'POST',
-    headers:{'Authorization':`Bearer ${apiKey}`,'Content-Type':'application/json'},
-    body:JSON.stringify({from,to:[email],subject:'رمز تغيير كلمة مرور M5K',text:`رمز التحقق لتغيير كلمة مرور حسابك في M5K هو: ${code}\nصلاحية الرمز 10 دقائق. إذا لم تطلب ذلك فتجاهل الرسالة.`,html})
-  });
-  if(!response.ok){
-    const detail=await response.text().catch(()=> '');
-    console.error('[password-reset] Resend API failed:',response.status,detail.slice(0,500));
-    throw new Error('تعذر إرسال رسالة التحقق عبر خدمة البريد. تحقق من إعدادات Resend.');
-  }
-  return true;
-}
-app.post('/api/auth/forgot-password', resetLimit, wrap(async (req,res)=>{
-  const email=cleanEmail(req.body.email);
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({error:'اكتب البريد الإلكتروني الصحيح الذي سجلت به.'});
-  if(!process.env.RESEND_API_KEY || !process.env.RESEND_FROM) return res.status(503).json({error:'خدمة البريد غير مهيأة بعد. أضف RESEND_API_KEY وRESEND_FROM في Render.'});
-  const user=await store.getUserByEmail(email);
-  if(user){
-    const code=String(crypto.randomInt(100000,1000000));
-    resetCodes.set(email,{userId:user.id,hash:crypto.createHash('sha256').update(code).digest('hex'),expires:Date.now()+10*60*1000,attempts:0});
-    await sendResetEmail(email,code);
-  }
-  res.json({ok:true,message:'إذا كان البريد مسجلًا، فسيصلك رمز تحقق خلال لحظات.'});
-}));
-app.post('/api/auth/reset-password', resetLimit, wrap(async(req,res)=>{
-  const email=cleanEmail(req.body.email), code=String(req.body.code||'').trim(), password=String(req.body.password||'');
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!/^[0-9]{6}$/.test(code)) return res.status(400).json({error:'البريد أو رمز التحقق غير صحيح.'});
-  if(password.length<10||password.length>100) return res.status(400).json({error:'كلمة المرور الجديدة يجب أن تكون بين 10 و100 حرف.'});
-  const entry=resetCodes.get(email);
-  if(!entry||entry.expires<Date.now()||entry.attempts>=5) {resetCodes.delete(email);return res.status(400).json({error:'انتهت صلاحية الرمز أو أنه غير صحيح. اطلب رمزًا جديدًا.'});}
-  entry.attempts++;
-  const hash=crypto.createHash('sha256').update(code).digest('hex');
-  if(!crypto.timingSafeEqual(Buffer.from(hash),Buffer.from(entry.hash))) return res.status(400).json({error:'رمز التحقق غير صحيح.'});
-  const passwordHash=await bcrypt.hash(password,12);
-  await store.updatePassword(entry.userId,passwordHash); resetCodes.delete(email);
-  res.json({ok:true,message:'تم تغيير كلمة المرور بنجاح.'});
-}));
-setInterval(()=>{for(const [email,v] of resetCodes) if(v.expires<Date.now()) resetCodes.delete(email);},60000).unref();
 
 app.get('/api/me', auth, wrap(async (req, res) => {
   const user = await store.getUser(req.user.id);
