@@ -262,3 +262,226 @@ button,a,input,select,textarea{touch-action:manipulation}
   .featured-card .icon{width:44px;height:44px}
   .quiz-box h1{font-size:20px}
 }
+
+/* v19: accounts, leaderboard, save note */
+.leader.me{border-color:#8b5cf6;background:linear-gradient(90deg,#8b5cf622,#11111a);box-shadow:0 0 0 1px #8b5cf655}
+.leader span small{color:#a98aff;font-size:11px}
+.leader-filter{display:block;margin:18px auto 0;max-width:340px;width:100%;background:#08080e;border:1px solid var(--line);border-radius:11px;padding:11px 13px;color:#fff;outline:0}
+.leader-filter:focus{border-color:#8b5cf6}
+.my-rank{text-align:center;color:#c4b5fd;font-size:14px;margin:16px 8px}
+.save-note{font-size:14px;margin:6px 0 14px;line-height:1.8}
+#saveNoteBtn{max-width:240px;margin:0 auto 14px;padding:10px 18px}
+
+/* Account pages, preferences, and FAQ */
+.account-panel,.settings-panel{max-width:680px;margin:0 auto;text-align:center;padding:30px}
+.profile-avatar{width:84px;height:84px;margin:0 auto 14px;display:grid;place-items:center;border-radius:28px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);font-size:34px;font-weight:900;color:white;box-shadow:0 12px 35px #8b5cf633}
+.account-panel h2{margin:8px 0}.muted{color:var(--muted);line-height:1.8}
+.account-panel .profile-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:25px 0}
+.account-panel .profile-stats>div{padding:18px 8px;border:1px solid var(--line);border-radius:15px;background:#ffffff05}
+.account-panel .profile-stats b{display:block;font-size:24px;color:#c4b5fd}.account-panel .profile-stats span{display:block;color:var(--muted);margin-top:5px}
+.settings-panel{text-align:right}.settings-panel label{display:block;margin:18px 0;color:var(--text);font-weight:700}.settings-panel select{display:block;width:100%;margin-top:9px}
+.faq-list{max-width:850px;margin:0 auto;display:grid;gap:12px}.faq-list details{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px 20px}.faq-list summary{cursor:pointer;font-weight:800;color:var(--text)}.faq-list details p{color:var(--muted);line-height:1.9;margin:14px 0 0}
+body.theme-light{--bg:#f4f6fb;--panel:#fff;--text:#151827;--muted:#5f6678;--line:#dce1ec;background:#f4f6fb;color:#151827}
+body.theme-light .topbar,body.theme-light footer{background:#ffffffed;border-color:#dce1ec;color:#151827}
+body.theme-light .topbar nav button,body.theme-light .brand,body.theme-light .account-area{color:#151827}
+body.theme-light .panel,body.theme-light .game-card,body.theme-light .hero-card,body.theme-light .faq-list details{background:#fff;color:#151827;border-color:#dce1ec}
+body.theme-light input,body.theme-light select,body.theme-light textarea,body.theme-light .leader-filter{background:#fff;color:#151827;border-color:#dce1ec}
+body.theme-midnight{background:#050914}
+@media(max-width:700px){.account-panel,.settings-panel{padding:22px 15px}.account-panel .profile-stats{gap:7px}.account-panel .profile-stats b{font-size:19px}.faq-list details{padding:15px}}
+
+/* M5K v20 — polished profile popover and game discovery */
+.topbar{gap:18px;box-shadow:0 10px 40px #0002}
+.topbar nav{align-items:center;gap:5px}
+.topbar nav button{position:relative;isolation:isolate;transition:color .22s ease,transform .22s ease,background .22s ease;border:1px solid transparent}
+.topbar nav button::after{content:"";position:absolute;inset:auto 14px 5px;height:2px;border-radius:9px;background:linear-gradient(90deg,#8b5cf6,#5ee7ff);transform:scaleX(0);transform-origin:center;transition:transform .22s ease;z-index:-1}
+.topbar nav button:hover{color:#fff;background:linear-gradient(135deg,#8b5cf61c,#5ee7ff0c);border-color:#8b5cf633;transform:translateY(-2px);box-shadow:0 7px 20px #8b5cf61a}
+.topbar nav button:hover::after{transform:scaleX(1)}
+.account-area{position:relative;display:flex;align-items:center;gap:10px;margin-right:auto;margin-left:0;flex-shrink:0}
+.account-area .account-status{color:#a9a8bd;font-size:11px;white-space:nowrap}
+.profile-menu-wrap{position:relative}
+.profile-menu-trigger{display:flex;align-items:center;gap:9px;padding:6px 10px 6px 7px;border:1px solid #ffffff17;border-radius:15px;background:linear-gradient(145deg,#171725,#10101a);color:#fff;transition:.22s;max-width:210px}
+.profile-menu-trigger:hover,.profile-menu-trigger[aria-expanded="true"]{border-color:#8b5cf688;background:#1b1630;box-shadow:0 8px 26px #8b5cf622;transform:translateY(-1px)}
+.avatar-mini{width:34px;height:34px;display:grid;place-items:center;flex-shrink:0;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#36c9dc);color:white;font-size:15px;font-weight:900;box-shadow:0 4px 14px #8b5cf633}
+.avatar-mini.large{width:42px;height:42px;border-radius:14px;font-size:18px}
+.profile-menu-name{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:800}
+.menu-chevron{color:#a6a2bc;font-size:17px;transition:transform .2s}.profile-menu-trigger[aria-expanded="true"] .menu-chevron{transform:rotate(180deg)}
+.profile-dropdown{position:absolute;top:calc(100% + 12px);left:0;width:270px;padding:9px;border:1px solid #ffffff18;border-radius:19px;background:rgba(17,17,27,.97);backdrop-filter:blur(22px);box-shadow:0 22px 70px #0009;opacity:0;visibility:hidden;transform:translateY(-7px) scale(.98);transform-origin:top left;transition:opacity .18s ease,transform .18s ease,visibility .18s;z-index:50}
+.profile-dropdown.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.dropdown-user{display:flex;align-items:center;gap:12px;padding:10px 9px 13px}.dropdown-user>div{min-width:0;display:flex;flex-direction:column;gap:3px}.dropdown-user strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dropdown-user small{font-size:10px;color:#9998b0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px}
+.dropdown-divider{height:1px;background:#ffffff12;margin:5px 3px}
+.profile-dropdown>button{width:100%;display:flex;align-items:center;gap:12px;text-align:right;padding:10px 11px;border-radius:12px;background:transparent;color:#e9e8f4;transition:background .16s,color .16s,transform .16s}
+.profile-dropdown>button>span:first-child{width:27px;height:27px;display:grid;place-items:center;border-radius:9px;background:#ffffff09;font-size:14px}
+.profile-dropdown>button>span:last-child{display:flex;flex-direction:column;font-size:12px;font-weight:800;gap:1px}
+.profile-dropdown>button small{font-size:10px;font-weight:500;color:#8e8da5}
+.profile-dropdown>button:hover{background:#8b5cf61a;color:#fff;transform:translateX(-2px)}
+.profile-dropdown>button.dropdown-login{color:#c9b9ff}
+#home.page.active{max-width:1280px;padding-top:44px}
+#home .hero{position:relative;isolation:isolate;overflow:hidden;grid-template-columns:1.15fr .85fr;gap:50px;min-height:500px;padding:48px 42px;border:1px solid #ffffff10;border-radius:32px;background:radial-gradient(ellipse at 85% 25%,#8b5cf626,transparent 38%),radial-gradient(ellipse at 5% 90%,#20c7df13,transparent 42%),linear-gradient(135deg,#12121fdd,#0c0c14f2);box-shadow:0 30px 100px #0004}
+#home .hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;background-image:linear-gradient(#ffffff0a 1px,transparent 1px),linear-gradient(90deg,#ffffff0a 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(90deg,transparent,#000)}
+#home .hero-copy{position:relative;z-index:1}
+#home .hero .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border:1px solid #a78bfa38;border-radius:999px;background:#8b5cf615;letter-spacing:.2px}
+.eyebrow-dot{width:7px;height:7px;border-radius:50%;background:#5ee7a0;box-shadow:0 0 12px #5ee7a0;display:inline-block}
+#home .hero h1{font-size:clamp(42px,5.1vw,68px);letter-spacing:-1.4px;line-height:1.22;margin:23px 0 18px}
+#home .hero h1 strong{background:linear-gradient(95deg,#c4a7ff 0%,#7f9dff 48%,#5ee7ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 7px 24px #8b5cf622)}
+#home .hero-copy>p{max-width:590px;font-size:16px;line-height:2;color:#aaaabd}
+#home .actions .primary{padding:14px 24px;border-radius:13px;background:linear-gradient(110deg,#9a6cff,#6544d5);box-shadow:0 10px 32px #8b5cf644;transition:.2s}
+#home .actions .primary:hover{transform:translateY(-3px);box-shadow:0 15px 36px #8b5cf666}
+#home .mini-stats{flex-wrap:wrap;gap:12px;margin-top:27px}
+#home .mini-stats span{padding:8px 11px;border:1px solid #ffffff0d;background:#ffffff05;border-radius:10px;color:#b3b2c6}
+#home .hero-card{position:relative;z-index:1;border:1px solid #a78bfa30;border-radius:27px;background:linear-gradient(145deg,#201b35ee,#11111bee);box-shadow:0 22px 70px #0007, inset 0 1px #ffffff0c;transition:transform .28s,border-color .28s,box-shadow .28s}
+#home .hero-card:hover{transform:translateY(-6px) rotate(.3deg);border-color:#a78bfa77;box-shadow:0 30px 85px #0009,0 0 40px #8b5cf61b}
+#home .hero-card .orb{width:145px;height:145px;display:grid;place-items:center;margin:14px auto 20px;border-radius:38px;font-size:72px;background:radial-gradient(circle at 30% 20%,#a78bfa42,#5ee7ff0b 70%);border:1px solid #ffffff12;box-shadow:0 0 55px #8b5cf61c;animation:m5kFloat 5s ease-in-out infinite}
+@keyframes m5kFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+#home .section-title{margin:48px 0 24px;align-items:center}
+#home .section-kicker{display:inline-block;color:#bda7ff;font-weight:900;font-size:12px;letter-spacing:.5px;margin-bottom:5px}
+#home .section-title h2{font-size:clamp(23px,3vw,31px);letter-spacing:-.4px}
+#home .featured-games{width:min(100%,1000px);gap:13px}
+#home .featured-card{position:relative;overflow:hidden;min-height:112px!important;border:1px solid #ffffff10;background:linear-gradient(110deg,#151522,#10101a 65%,#151225);box-shadow:0 8px 24px #0002;transition:transform .23s ease,border-color .23s ease,box-shadow .23s ease,background .23s ease}
+#home .featured-card::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 15%,#8b5cf612 50%,#5ee7ff0b 100%);opacity:0;transition:opacity .23s}
+#home .featured-card:hover{transform:translateY(-4px) scale(1.006);border-color:#a78bfa66;box-shadow:0 15px 38px #0005,0 0 0 1px #8b5cf612;background:#171526}
+#home .featured-card:hover::before{opacity:1}
+#home .featured-card .icon{transition:transform .23s,box-shadow .23s;box-shadow:inset 0 1px #ffffff13}
+#home .featured-card:hover .icon{transform:scale(1.07) rotate(-4deg);box-shadow:0 8px 25px #8b5cf622}
+#home .featured-card .featured-info,#home .featured-card .icon,#home .featured-card .play-btn{position:relative;z-index:1}
+#home .featured-card h3{font-size:16px;margin:0 0 4px}
+#home .featured-card p{margin:0;line-height:1.8}
+#home .featured-card .play-btn{transition:transform .2s,box-shadow .2s,filter .2s}
+#home .featured-card:hover .play-btn{transform:translateY(-1px);box-shadow:0 8px 25px #8b5cf655;filter:brightness(1.1)}
+#games .game-card{overflow:hidden;transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease,background .24s ease}
+#games .game-card:hover{transform:translateY(-6px);border-color:#9b7aff88;background:linear-gradient(145deg,#171526,#11111b);box-shadow:0 18px 38px #0005,0 0 0 1px #8b5cf614}
+#games .game-card .icon{transition:transform .24s,filter .24s}
+#games .game-card:hover .icon{transform:scale(1.08) rotate(-3deg);filter:brightness(1.15)}
+@media(max-width:850px){#home.page.active{padding-top:28px}#home .hero{grid-template-columns:1fr;gap:24px;padding:30px 22px;min-height:auto}#home .hero-card{max-width:520px;width:100%;margin:auto}#home .hero h1{font-size:clamp(39px,8vw,58px)}}
+@media(max-width:700px){.profile-menu-name,.menu-chevron,.account-status{display:none!important}.profile-menu-trigger{padding:5px;border-radius:13px}.profile-dropdown{left:-8px;width:min(270px,calc(100vw - 28px))}.topbar{gap:7px}.topbar nav{display:none}.account-area{gap:7px}.account-area .account-btn{font-size:10px;padding:8px 9px}#home .hero{padding:25px 17px;border-radius:23px}#home .hero-card{padding:24px 18px}#home .section-title{margin-top:35px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
+
+/* M5K v22: lightweight interface, no hover animations, vertically stacked featured games */
+.topbar nav button,.ghost,.primary,.secondary,.game-card,.hero-card,.featured-card,.featured-card .icon,.featured-card .play-btn,.profile-menu-trigger,.profile-dropdown>button,.answer,.finish button {transition:none!important;animation:none!important;}
+.topbar nav button:hover,.ghost:hover,.primary:hover,.game-card:hover,#games .game-card:hover,#home .featured-card:hover,#home .hero-card:hover,#home .featured-card:hover .icon,#home .featured-card:hover .play-btn,.profile-menu-trigger:hover,.profile-dropdown>button:hover,.answer:hover,.finish button:hover {transform:none!important;filter:none!important;box-shadow:initial;}
+.topbar nav button:hover,.ghost:hover {background:transparent!important;color:inherit!important;border-color:transparent!important;}
+#home .featured-games{display:flex!important;flex-direction:column!important;width:min(100%,900px)!important;margin:0 auto!important;gap:14px!important;}
+#home .featured-card{display:grid!important;grid-template-columns:64px minmax(0,1fr) auto!important;align-items:center!important;gap:18px!important;width:100%!important;min-height:112px!important;padding:20px 23px!important;border-radius:20px!important;background:linear-gradient(110deg,#151522,#10101a 70%,#171326)!important;border:1px solid #ffffff12!important;box-shadow:0 8px 24px #0002!important;}
+#home .featured-card::before{display:none!important}
+#home .featured-card .icon{width:58px;height:58px;border-radius:17px;font-size:27px}
+#home .featured-card .play-btn{min-width:88px;padding:11px 18px;border-radius:11px}
+#home .featured-card h3{font-size:16px;margin:0 0 5px}
+#home .featured-card p{font-size:12px;color:var(--muted);margin:0;line-height:1.8}
+#home .section-title{max-width:900px;margin:45px auto 22px;display:flex;justify-content:space-between;gap:16px}
+#home .community-strip{width:min(100%,900px);margin:28px auto 10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#home .community-tip{padding:17px;border:1px solid #ffffff10;border-radius:16px;background:linear-gradient(145deg,#141421,#0f0f18);display:flex;align-items:flex-start;gap:11px}
+#home .community-tip .tip-icon{width:36px;height:36px;flex:0 0 36px;border-radius:11px;display:grid;place-items:center;background:#8b5cf61a;font-size:17px}
+#home .community-tip strong{display:block;font-size:12px;margin:1px 0 5px}
+#home .community-tip p{font-size:11px;line-height:1.7;color:var(--muted);margin:0}
+@media(max-width:650px){#home .featured-card{grid-template-columns:48px minmax(0,1fr) auto!important;gap:11px!important;padding:14px!important;min-height:92px!important}#home .featured-card .icon{width:46px;height:46px;font-size:22px;border-radius:13px}#home .featured-card .play-btn{min-width:62px;padding:9px 11px;font-size:12px}#home .featured-card h3{font-size:14px}#home .featured-card p{font-size:11px}#home .community-strip{grid-template-columns:1fr;gap:9px}#home .community-tip{padding:14px}#home .section-title{align-items:flex-start}#home .see-all-btn{white-space:nowrap;font-size:11px}}
+
+
+/* M5K v23 — static, lightweight interface: hover visuals removed site-wide */
+*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important;}
+*:hover{transform:none!important;filter:none!important;backdrop-filter:none!important;text-decoration:none!important;}
+button:hover,a:hover,.topbar nav button:hover,.game-card:hover,.featured-card:hover,.hero-card:hover,.profile-dropdown>button:hover,.answer:hover,.answer-btn:hover,.finish button:hover{box-shadow:initial!important;outline:none!important;}
+#home .hero-card .orb{animation:none!important;}
+#home .featured-card:hover,#games .game-card:hover{background:linear-gradient(110deg,#151522,#10101a 70%,#171326)!important;border-color:#ffffff12!important;}
+.rewards-section{width:min(100%,900px);margin:44px auto 10px;}
+.rewards-heading{margin:0 auto 18px!important;}
+.daily-challenge-card{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:17px;align-items:center;padding:22px;border:1px solid #8b5cf633;border-radius:20px;background:linear-gradient(115deg,#171329,#10101a 72%,#11202a);}
+.daily-icon{width:56px;height:56px;display:grid;place-items:center;font-size:28px;border-radius:16px;background:#8b5cf620;border:1px solid #8b5cf633;}
+.daily-tag{font-size:11px;font-weight:900;color:#bda7ff;}
+.daily-copy h3{margin:5px 0;font-size:18px;}
+.daily-copy p{margin:0;color:var(--muted);font-size:12px;line-height:1.8;}
+.daily-play{white-space:nowrap;box-shadow:none!important;}
+.achievement-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px;}
+.achievement-card{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:11px;align-items:center;padding:16px;border:1px solid #ffffff10;border-radius:16px;background:linear-gradient(145deg,#141421,#0f0f18);}
+.achievement-card>span{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:#8b5cf61a;font-size:20px;}
+.achievement-card b{font-size:12px;display:block;}
+.achievement-card p{margin:4px 0 0;font-size:11px;line-height:1.7;color:var(--muted);}
+.achievement-card small{font-size:10px;color:#aaa4c1;white-space:nowrap;}
+.achievement-card.unlocked{border-color:#4ade8038;background:linear-gradient(145deg,#10251e,#11151b);}
+.achievement-card.unlocked small{color:#4ade80;}
+.rewards-note{font-size:11px;line-height:1.8;color:var(--muted);margin:13px 2px 0;}
+@media(max-width:650px){.daily-challenge-card{grid-template-columns:46px minmax(0,1fr);padding:15px;gap:12px}.daily-icon{width:44px;height:44px;font-size:23px}.daily-play{grid-column:1/-1;width:100%}.achievement-grid{grid-template-columns:1fr}.achievement-card{padding:14px}.rewards-section{margin-top:32px}}
+/* Neutralize remaining color/border hover states as well; only game feedback states may change. */
+.answer:hover,.answer-btn:hover{background:#11111a!important;border-color:var(--line)!important;color:inherit!important;}
+.finish button:hover,.finish-actions .secondary:hover{background:#151522!important;border-color:var(--line)!important;color:inherit!important;}
+.hint-btn:hover{background:#8b5cf622!important;border-color:#8b5cf655!important;color:#c5aaff!important;}
+.secondary:hover{background:rgba(155,92,255,.12)!important;border-color:rgba(155,92,255,.45)!important;color:#fff!important;}
+.exit-game-btn:hover{background:rgba(251,113,133,.08)!important;border-color:rgba(251,113,133,.28)!important;color:#fecdd3!important;}
+.footer-link:hover{color:#9f8bd1!important;}
+.see-all-btn:hover{background:transparent!important;border-color:inherit!important;color:inherit!important;}
+.social-card:hover{background:inherit!important;border-color:inherit!important;}
+
+/* M5K v24: restore the original restrained theme and fully disable hover styling */
+*:hover,*:focus-visible{transform:none!important;filter:none!important;box-shadow:none!important;transition:none!important;text-decoration:none!important;}
+button:hover,a:hover,nav button:hover,.ghost:hover,.primary:hover,.secondary:hover,.game-card:hover,.featured-card:hover,.hero-card:hover,.profile-dropdown>button:hover,.answer:hover,.answer-btn:hover,.finish button:hover,.hint-btn:hover,.footer-link:hover,.exit-game-btn:hover,.social-card:hover,.see-all-btn:hover{background-image:none!important;background-color:inherit!important;color:inherit!important;border-color:inherit!important;outline:none!important;}
+.topbar nav button:hover,.ghost:hover{background:transparent!important;color:#b8b8c6!important;}
+.primary:hover{background:#7650dc!important;color:#fff!important;}
+.secondary:hover{background:#ffffff08!important;color:inherit!important;}
+#home .hero{background:var(--panel,#101019)!important;box-shadow:none!important;border-color:var(--line)!important;}
+#home .hero::before{display:none!important;}
+#home .hero .eyebrow{background:transparent!important;border-color:var(--line)!important;}
+#home .hero h1 strong{background:none!important;color:#b99cff!important;-webkit-text-fill-color:#b99cff!important;filter:none!important;}
+#home .hero-card{background:var(--panel,#11111a)!important;box-shadow:none!important;border-color:var(--line)!important;}
+#home .hero-card .orb{background:#8b5cf622!important;box-shadow:none!important;animation:none!important;}
+#home .actions .primary{background:#7650dc!important;box-shadow:none!important;}
+#home .featured-card,#games .game-card{background:var(--panel,#11111a)!important;box-shadow:none!important;border-color:var(--line)!important;}
+#home .featured-card::before{display:none!important;}
+#home .featured-card .icon,#games .game-card .icon{box-shadow:none!important;filter:none!important;}
+.daily-challenge-card{background:var(--panel,#11111a)!important;border-color:var(--line)!important;}
+.daily-icon,.achievement-card>span{background:#8b5cf615!important;border-color:var(--line)!important;}
+.achievement-card,.community-tip{background:var(--panel,#11111a)!important;box-shadow:none!important;}
+.achievement-card.unlocked{background:var(--panel,#11111a)!important;border-color:var(--line)!important;}
+.profile-menu-trigger,.profile-dropdown{backdrop-filter:none!important;box-shadow:none!important;transition:none!important;}
+@media(max-width:650px){#home .featured-card{grid-template-columns:48px minmax(0,1fr) auto!important;}}
+
+/* Account avatar upload */
+.profile-avatar.has-photo,.avatar-mini.has-photo{background-position:center;background-size:cover;background-repeat:no-repeat;color:transparent!important;overflow:hidden}
+.avatar-upload-btn{display:inline-flex;align-items:center;justify-content:center;margin:10px auto;padding:9px 14px;border:1px solid var(--border-color,rgba(160,130,255,.25));border-radius:10px;cursor:pointer;font-size:.9rem;color:var(--text-color,#eee)}
+
+/* Disable hover motion site-wide; keep the base design unchanged. */
+*, *::before, *::after { scroll-behavior: auto; }
+button:hover, a:hover, .game-card:hover, .play-btn:hover, .nav button:hover { transform: none !important; animation: none !important; filter: none !important; }
+
+
+/* v26: intentionally static UI — no hover animations, color shifts or transforms anywhere */
+*, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+*:hover, *:focus-visible { transform: none !important; filter: none !important; box-shadow: none !important; text-decoration: none !important; }
+button:hover, a:hover, nav button:hover, .game-card:hover, .featured-card:hover, .hero-card:hover, .profile-dropdown>button:hover, .answer:hover, .answer-btn:hover, .finish button:hover, .hint-btn:hover, .footer-link:hover, .exit-game-btn:hover, .social-card:hover, .see-all-btn:hover, .primary:hover, .secondary:hover { background-image: none !important; background-color: inherit !important; color: inherit !important; border-color: inherit !important; outline: none !important; }
+.streak-count{min-width:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-inline-start:1px solid var(--line);padding-inline-start:18px;color:var(--muted)}
+.streak-count b{font-size:2rem;line-height:1.1;color:inherit}.streak-count span{font-size:.8rem;margin-top:5px}
+@media(max-width:600px){.streak-card{align-items:flex-start}.streak-count{border-inline-start:0;border-top:1px solid var(--line);padding:12px 0 0;align-items:flex-start;width:100%}.finish-actions{flex-wrap:wrap}}
+
+/* v27: classic static game cards; no hover motion or color effects */
+#home .featured-games{display:flex!important;flex-direction:column!important;gap:14px!important;}
+#home .featured-card{grid-template-columns:64px minmax(0,1fr) auto!important;align-items:center!important;min-height:138px!important;padding:20px 22px!important;background:var(--panel,#11111a)!important;border:1px solid var(--line,#292638)!important;border-radius:16px!important;box-shadow:none!important;transform:none!important;}
+#home .featured-card .featured-info{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:7px;}
+#home .featured-card h3{font-size:17px!important;line-height:1.5!important;margin:0!important;}
+#home .featured-card p{font-size:13px!important;line-height:1.9!important;margin:0!important;color:var(--muted,#aaa7ba)!important;max-width:720px;}
+#home .featured-card .icon{width:58px!important;height:58px!important;display:flex;align-items:center;justify-content:center;border-radius:14px!important;box-shadow:none!important;transform:none!important;}
+#home .featured-card .game-card-tag{display:inline-block;margin-top:2px;padding:4px 9px;border:1px solid var(--line,#292638);border-radius:7px;color:var(--muted,#aaa7ba);font-size:11px;line-height:1.5;}
+#home .featured-card .play-btn{align-self:center;min-width:84px!important;box-shadow:none!important;transform:none!important;}
+/* Disable hover visuals across the entire site, including older component rules */
+*,*::before,*::after{scroll-behavior:auto!important;}
+button:hover,a:hover,[role="button"]:hover,nav button:hover,.game-card:hover,.featured-card:hover,.hero-card:hover,.profile-dropdown>button:hover,.answer:hover,.answer-btn:hover,.finish button:hover,.hint-btn:hover,.footer-link:hover,.exit-game-btn:hover,.social-card:hover,.see-all-btn:hover,.primary:hover,.secondary:hover{transform:none!important;animation:none!important;transition:none!important;filter:none!important;box-shadow:none!important;background-image:none!important;}
+@media(max-width:650px){#home .featured-card{grid-template-columns:46px minmax(0,1fr) auto!important;gap:12px!important;padding:14px!important;min-height:132px!important}#home .featured-card .icon{width:44px!important;height:44px!important;font-size:21px!important}#home .featured-card h3{font-size:14px!important}#home .featured-card p{font-size:11px!important}#home .featured-card .play-btn{min-width:58px!important;padding:9px 10px!important;font-size:12px!important}}
+
+/* Refined M5K authentication screen: restrained original palette, no hover motion. */
+.auth-panel{max-width:440px!important;padding:30px!important;border-radius:20px!important}
+.auth-brand{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;font-size:23px;font-weight:900;letter-spacing:1px;margin-bottom:14px}
+.auth-panel h1{margin:0 0 8px;font-size:29px}
+.auth-panel>p:not(.answer-msg){margin:0 0 22px;color:var(--muted,#aaa);line-height:1.8}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border:1px solid #ffffff16;border-radius:12px;margin:0 0 18px;background:#00000012}
+.auth-tab{border:0;border-radius:9px;padding:11px;background:transparent;color:inherit;font:inherit;cursor:pointer}
+.auth-tab.active{background:#8b5cf622;border:1px solid #8b5cf644;color:#c4b5fd;font-weight:800}
+.google-auth-btn{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;box-sizing:border-box;padding:12px 15px;border:1px solid #ffffff24;border-radius:12px;color:inherit;text-decoration:none;font-weight:700;background:transparent}
+.google-mark{font-family:Arial,sans-serif;font-weight:900;font-size:20px;color:#4285f4}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muted,#aaa);font-size:13px}
+.auth-divider:before,.auth-divider:after{content:"";height:1px;background:#ffffff1c;flex:1}
+.auth-panel label{display:block;margin:13px 0;font-size:14px;font-weight:700}
+.auth-panel input{width:100%;box-sizing:border-box;margin-top:8px;padding:12px 13px;border:1px solid #ffffff20;border-radius:11px;background:#00000015;color:inherit;font:inherit;outline:none}
+.forgot-password-link{display:block;text-align:left;margin:4px 0 17px;color:#b8a0ff;text-decoration:none;font-size:13px}
+.auth-panel .auth-switch{background:transparent;border:0;color:inherit;text-decoration:none}
+.auth-panel a,.auth-panel button{transition:none!important;animation:none!important}
+.auth-panel a:hover,.auth-panel button:hover{transform:none!important;filter:none!important;box-shadow:none!important;color:inherit}
+[hidden]{display:none!important}
+/* Google sign-in is intentionally kept local until M5K OAuth credentials are configured. */
+button.google-auth-btn{font:inherit;cursor:pointer;text-align:center;}

@@ -1,13 +1,3 @@
-const API_BASE = 'https://m5k.onrender.com';
-
-const originalFetch = window.fetch.bind(window);
-
-window.fetch = (input, init) => {
-  if (typeof input === 'string' && input.startsWith('/api/')) {
-    input = API_BASE + input;
-  }
-  return originalFetch(input, init);
-};
 
 const ID_ALIASES = {
   questionNumber: ["questionNumber", "qNumber", "counter"],
@@ -38,6 +28,7 @@ const modes = {
   speed:{name:"⚡ تحدي السرعة", desc:"أسئلة سريعة، والوقت القصير يزيد التحدي.", time:7},
   guess:{name:"🎯 خمنها", desc:"خمن الشيء أو الشخص أو المكان من التلميح.", time:15},
   imageguess:{name:"🖼️ خمن الصورة", desc:"شاهد منتجًا حقيقيًا واختر العلامة الصحيحة.", time:18},
+  logotruth:{name:"🏷️ الشعار صحيح", desc:"قارن بين شعارين واكتشف الشعار المكتوب بشكل صحيح.", time:18},
   playerguess:{name:"⚽ خمن اللاعب", desc:"شاهد وجه اللاعب كاملًا واختر اسمه.", time:18},
   celebrityguess:{name:"🌟 خمن المشهور", desc:"شاهد صورة المشهور أو اليوتيوبر وخمّن من هو.", time:18},
   youtuberguess:{name:"▶️ خمن اليوتيوبر", desc:"شاهد صورة اليوتيوبر وخمّن من هو.", time:18},
@@ -62,6 +53,47 @@ const modes = {
   tf:{name:"صح أو خطأ", desc:"احكم على المعلومة: صحيحة أم خاطئة.", time:8},
   mixed:{name:"🧩 أسئلة متنوعة وعشوائية", desc:"مزيج عشوائي من جميع الألعاب.", time:15}
 };
+
+function makeLogoTruthQuestions(){
+  const brands = [
+    ['Google','Gooogle','#4285f4','Google_2015_logo.svg'],['YouTube','YoutTube','#ff0000','YouTube_full-color_icon_(2017).svg'],
+    ['Netflix','Netflx','#e50914','Netflix_2015_logo.svg'],['Amazon','Amazoon','#232f3e','Amazon_logo.svg'],
+    ['Facebook','Facebok','#1877f2','Facebook_Logo_(2019).png'],['Instagram','Instagarm','#c13584','Instagram_logo_2022.svg'],
+    ['Microsoft','Microsft','#00a4ef','Microsoft_logo_(2012).svg'],['Apple','Aplpe','#111111','Apple_logo_black.svg'],
+    ['Samsung','Samsng','#1428a0','Samsung_Logo.svg'],['Adidas','Addidas','#111111','Adidas_Logo.svg'],
+    ['Nike','Nkie','#111111','Nike.svg'],['Coca-Cola','Coca-Colaa','#d71920','Coca-Cola_logo.svg'],
+    ['Pepsi','Pespi','#005cb4','Pepsi_logo.svg'],['McDonald’s','McDonallds','#ffc72c','McDonalds_Logo.svg'],
+    ['Spotify','Spotfiy','#1db954','Spotify_logo_without_text.svg'],['PlayStation','PlayStaton','#003791','PlayStation_logo.svg'],
+    ['Xbox','Xbxo','#107c10','Xbox_one_logo.svg'],['Nintendo','Nintedo','#e60012','Nintendo_Logo.svg'],
+    ['Telegram','Tele gram','#229ed9','Telegram_logo.svg'],['WhatsApp','WhatsAppa','#25d366','WhatsApp.svg'],
+    ['TikTok','Tik Tok','#111111','TikTok_logo.svg'],['Adobe','Adove','#ed1c24','Adobe_Corporate_logo.svg'],
+    ['Intel','Intell','#0071c5','Intel_logo_(2020,_light_blue).svg'],['Dell','Dlel','#007db8','Dell_Logo.svg'],
+    ['Lenovo','Lenvo','#e2231a','Lenovo_logo_2015.svg'],['Puma','Pumma','#111111','Puma_logo.svg'],
+    ['Lacoste','Lacost','#004526','Lacoste_logo.svg'],['Toyota','Toyta','#eb0a1e','Toyota_EU_logo.svg'],
+    ['Mercedes-Benz','Mercedez-Benz','#222222','Mercedes-Benz_Logo_2010.svg'],['BMW','BWM','#0066b3','BMW_logo_(gray).svg'],
+    ['Ferrari','Ferari','#d40000','Ferrari-Logo.svg'],['LEGO','LEOG','#d01012','LEGO_logo.svg'],
+    ['PayPal','PayPall','#003087','PayPal.svg'],['eBay','Ebayy','#e53238','EBay_logo.svg'],
+    ['Uber','Ubeer','#111111','Uber_logo_2018.svg'],['Airbnb','Airbnd','#ff5a5f','Airbnb_Logo_Bélo.svg'],
+    ['LinkedIn','LinkdIn','#0a66c2','LinkedIn_logo_initials.png'],['Zoom','Zom','#2d8cff','Zoom_Communications_Logo.svg'],
+    ['Canon','Cannon','#cc0000','Canon_logo.svg'],['NVIDIA','NVIDA','#76b900','Nvidia_logo.svg'],
+    ['Huawei','Huwai','#cf0a2c','Huawei_Standard_logo.svg'],['L’Oréal','Loreal','#111111','L’Oréal_logo.svg'],
+    ['Dior','Diior','#111111','Christian_Dior_logo.svg'],['Porsche','Porche','#111111','Porsche_Logo.svg'],
+    ['Lamborghini','Lamborgini','#d4af37','Lamborghini_Logo.svg'],['ASUS','ASUUS','#111111','ASUS_Logo.svg'],
+    ['Xiaomi','Xia omi','#ff6900','Xiaomi_logo.svg'],['H&M','H&Mm','#e50010','H&M-Logo.svg'],
+    ['IKEA','IEKA','#0051ba','IKEA_logo.svg'],['Prada','Pradda','#111111','Prada-Logo.svg'],
+    ['KFC','KCF','#c41230','KFC_logo.svg'],['Starbucks','Starbuks','#00704a','Starbucks_Corporation_Logo_2011.svg'],
+    ['Lego','Leog','#d01012','LEGO_logo.svg'],['Red Bull','RedBulll','#d71920','Red_Bull.svg'],
+    ['Rolex','Rollex','#006039','Rolex_logo.svg'],['Visa','VIsa','#1a1f71','Visa_2021.svg'],
+    ['Mastercard','Mastercad','#eb001b','Mastercard-logo.svg'],['Playboy','Playbooy','#111111','Playboy_logo.svg']
+  ];
+  const escapeText = v => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const wrongSvg = (label,color) => 'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300" viewBox="0 0 800 300"><rect width="800" height="300" rx="20" fill="#fff"/><rect x="20" y="20" width="760" height="260" rx="14" fill="#fafafa" stroke="#ddd"/><text x="400" y="170" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="${label.length>12?54:76}" font-weight="700" fill="${color}">${escapeText(label)}</text><text x="400" y="235" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" fill="#888">LOGO CHECK</text></svg>`);
+  return brands.map((b,i)=>{
+    const official='https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(b[3])+'?width=900';
+    const correctFirst=i%2===0;
+    return {m:'logotruth',d:i<15?'سهل':i<35?'متوسط':'صعب',q:`أي الصورتين تعرض شعار ${b[0]} الصحيح؟`,a:['الصورة الأولى','الصورة الثانية'],x:correctFirst?0:1,img1:correctFirst?official:wrongSvg(b[1],b[2]),img2:correctFirst?wrongSvg(b[1],b[2]):official};
+  });
+}
 
 const questions = [
 /* من يعرف أكثر */
@@ -271,6 +303,11 @@ const questions = [
 
 
 /* خمن الصورة — 35 سؤالاً بصور حقيقية من Wikimedia Commons */
+{m:"logotruth",d:"سهل",q:"أي الصورتين تعرض كتابة شعار Google الصحيحة؟",a:["الصورة الأولى","الصورة الثانية"],x:0,img1:"https://commons.wikimedia.org/wiki/Special:FilePath/Google_2015_logo.svg?width=1000",img2:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="260"><rect width="100%" height="100%" fill="white"/><text x="50%" y="58%" text-anchor="middle" font-family="Arial,sans-serif" font-size="125" font-weight="500" fill="#4285F4">Gooogle</text></svg>')},
+{m:"logotruth",d:"سهل",q:"أي شعار Google مكتوب بطريقة صحيحة؟",a:["الصورة الأولى","الصورة الثانية"],x:1,img1:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="260"><rect width="100%" height="100%" fill="white"/><text x="50%" y="58%" text-anchor="middle" font-family="Arial,sans-serif" font-size="125" font-weight="500" fill="#4285F4">Gogle</text></svg>'),img2:"https://commons.wikimedia.org/wiki/Special:FilePath/Google_2015_logo.svg?width=1000"},
+{m:"logotruth",d:"متوسط",q:"اختر الشعار الصحيح من بين الصورتين.",a:["الصورة الأولى","الصورة الثانية"],x:0,img1:"https://commons.wikimedia.org/wiki/Special:FilePath/Google_2015_logo.svg?width=1000",img2:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="260"><rect width="100%" height="100%" fill="white"/><text x="50%" y="58%" text-anchor="middle" font-family="Arial,sans-serif" font-size="125" fill="#4285F4">Googel</text></svg>')},
+/* عشرات تحديات الشعارات من شركات متنوعة؛ لكل سؤال صورتان مولدتان للشعار الصحيح والخاطئ */
+...makeLogoTruthQuestions(),
 {m:"imageguess",d:"سهل",q:"ما العلامة التجارية لهذا المنتج؟",a:["Apple","Samsung","Sony","Huawei"],x:0,img:"https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.jpg?width=1000",product:"منتج حقيقي"},
 {m:"imageguess",d:"سهل",q:"ما العلامة التجارية لهذا المنتج؟",a:["Coca-Cola","Pepsi","Fanta","Sprite"],x:0,img:"https://commons.wikimedia.org/wiki/Special:FilePath/Coca-cola_bottle.jpg?width=1000",product:"منتج حقيقي"},
 {m:"imageguess",d:"سهل",q:"ما العلامة التجارية لهذا المنتج؟",a:["Nike","Adidas","Puma","Reebok"],x:0,img:"https://commons.wikimedia.org/wiki/Special:FilePath/Nike_Shoe.jpg?width=1000",product:"منتج حقيقي"},
@@ -781,9 +818,31 @@ function show(id, bypassExit=false){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   const page = el(id);
   if(page) page.classList.add("active");
-  if(id === "profile") updateStats();
+  if(id === "profile") { updateStats(); renderAccountProfile(); }
+  renderHeaderAccount();
+  if(id === "settings") loadPreferencesUI();
   if(id === "leaders") updateLeaders();
 }
+
+function toggleProfileMenu(event){
+  event?.stopPropagation();
+  const menu=el('profileDropdown'),trigger=el('profileMenuTrigger');
+  if(!menu)return;
+  const open=!menu.classList.contains('open');menu.classList.toggle('open',open);trigger?.setAttribute('aria-expanded',String(open));
+  if(open)renderHeaderAccount();
+}
+function closeProfileMenu(){const menu=el('profileDropdown');menu?.classList.remove('open');el('profileMenuTrigger')?.setAttribute('aria-expanded','false');}
+function renderHeaderAccount(){
+  const u=getUser(),logged=!!getToken()&&!!u,name=logged?(u.username||'حسابي'):'زائر',initial=String(name||'م').trim().charAt(0).toUpperCase()||'م';
+  const set=(id,v)=>{const n=el(id);if(n)n.textContent=v;};
+  const avatar=logged&&u.preferences&&u.preferences.avatar?u.preferences.avatar:'';
+  ['headerAvatar','dropdownAvatar'].forEach(id=>{const n=el(id);if(!n)return;n.textContent=avatar?'':initial;n.style.backgroundImage=avatar?`url(\"${avatar}\")`:'';n.classList.toggle('has-photo',!!avatar);});set('headerProfileName',logged?name:'حسابي');set('dropdownName',name);set('dropdownEmail',logged?(u.email||'حسابك في مِخّك'):'سجّل الدخول لمزامنة بياناتك');set('accountStatus',logged?'متصل':'زائر');
+  const login=el('dropdownLogin');if(login)login.style.display=logged?'none':'flex';
+  const wrap=el('profileMenuWrap');if(wrap)wrap.hidden=!logged;
+  const auth= document.querySelector('.account-area > .account-btn');if(auth)auth.style.display=logged?'none':'inline-flex';
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.profile-menu-wrap'))closeProfileMenu();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfileMenu();});
 
 function animateLiveCount(target){
   target = Math.max(0, Number(target)||0);
@@ -908,7 +967,7 @@ function buildRound(){
   const unique = [];
   const seen = new Set();
   for(const q of shuffle(pool)){
-    const uniqueKey = (q.m === "imageguess" || q.m === "playerguess" || q.m === "celebrityguess" || q.m === "youtuberguess")
+    const uniqueKey = (q.m === "imageguess" || q.m === "logotruth" || q.m === "playerguess" || q.m === "celebrityguess" || q.m === "youtuberguess")
       ? `${q.m}|${q.creator || q.wiki || q.img || q.product || q.q}`
       : q.q;
     if(!seen.has(uniqueKey)){
@@ -1022,7 +1081,7 @@ function renderQuestion(){
     ? `دور: ${friendPlayers[friendTurn]} — السؤال ${current + 1} / ${round.length}`
     : `السؤال ${current + 1} / ${round.length}`;
   el("qCat").textContent = q.m === "guess" ? "🎯 خمنها" :
-                           q.m === "imageguess" ? "خمن الصورة" :
+                           q.m === "logotruth" ? "🏷️ الشعار صحيح" : q.m === "imageguess" ? "خمن الصورة" :
                            q.m === "playerguess" ? "⚽ خمن اللاعب" :
                            q.m === "celebrityguess" ? "🌟 خمن المشهور" :
                            q.m === "youtuberguess" ? "▶️ خمن اليوتيوبر" :
@@ -1054,7 +1113,31 @@ function renderQuestion(){
     const qt = el("questionText");
     qt.parentNode.insertBefore(imageBox, qt);
   }
-  if(q.m === "imageguess") {
+  if(q.m === "logotruth") {
+    imageBox.style.display = "block";
+    imageBox.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0"><div style="border:1px solid var(--border,#ddd);border-radius:12px;background:#fff;padding:12px;text-align:center"><span style="display:block;color:#555;margin-bottom:8px">الصورة الأولى</span><img class="logo-truth-image" data-logo-option="1" src="${q.img1}" alt="الشعار الأول" loading="eager" style="width:100%;height:130px;object-fit:contain"></div><div style="border:1px solid var(--border,#ddd);border-radius:12px;background:#fff;padding:12px;text-align:center"><span style="display:block;color:#555;margin-bottom:8px">الصورة الثانية</span><img class="logo-truth-image" data-logo-option="2" src="${q.img2}" alt="الشعار الثاني" loading="eager" style="width:100%;height:130px;object-fit:contain"></div></div>`;
+    // إذا فشلت أي صورة من الصورتين، احذف السؤال من الجولة وانتقل تلقائيًا للسؤال التالي.
+    const logoImages = imageBox.querySelectorAll('.logo-truth-image');
+    let logoQuestionSkipped = false;
+    const skipUnavailableLogoQuestion = () => {
+      if (logoQuestionSkipped || round[current] !== q || answered) return;
+      logoQuestionSkipped = true;
+      round.splice(current, 1);
+      const skipMsg = el('answerMsg');
+      if (skipMsg) {
+        skipMsg.textContent = '⚠️ تعذّر تحميل إحدى الصورتين، تم تخطي السؤال تلقائيًا.';
+        skipMsg.style.color = '#fbbf24';
+      }
+      clearInterval(timer);
+      setTimeout(() => {
+        if (current >= round.length) finishGame();
+        else renderQuestion();
+      }, 650);
+    };
+    logoImages.forEach(img => {
+      img.addEventListener('error', skipUnavailableLogoQuestion, { once: true });
+    });
+  } else if(q.m === "imageguess") {
     imageBox.style.display = "block";
     imageBox.innerHTML = `<div class="real-product-photo"><img id="visualImage" src="${q.img || ""}" alt="صورة منتج حقيقية" loading="eager"><div class="brand-blur" aria-hidden="true"></div></div>`;
   } else if(q.m === "playerguess") {
@@ -1174,7 +1257,7 @@ function renderQuestion(){
     ? 7
     : q.m === "tf"
       ? 8
-      : (q.m === "imageguess" || q.m === "playerguess" || q.m === "celebrityguess" || q.m === "youtuberguess")
+      : (q.m === "imageguess" || q.m === "logotruth" || q.m === "playerguess" || q.m === "celebrityguess" || q.m === "youtuberguess")
         ? 18
       : q.m === "flagguess" ? 15
       : q.m === "memory" ? 15
@@ -1276,10 +1359,49 @@ function submitAnswer(choice, button){
   },900);
 }
 
-function saveResultToBackend(modeName, finalScore, correctAnswers, totalQuestions){
-  const token=localStorage.getItem('m5kToken');
-  if(!token) return;
-  fetch('/api/results',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({mode:modeName,score:finalScore,correctAnswers,totalQuestions})}).catch(()=>{});
+function getToken(){ return localStorage.getItem('m5kToken')||''; }
+function getUser(){ try{ return JSON.parse(localStorage.getItem('m5kUser')||'null'); }catch{ return null; } }
+function setSession(token,user){
+  localStorage.setItem('m5kToken',token);
+  if(user){ localStorage.setItem('m5kUser',JSON.stringify(user)); localStorage.setItem('m5kPlayerName',user.username); }
+  setTimeout(renderHeaderAccount,0);
+}
+function clearSession(){ localStorage.removeItem('m5kToken'); localStorage.removeItem('m5kUser'); renderHeaderAccount(); }
+
+async function saveResultToBackend(modeName, finalScore, correctAnswers, totalQuestions){
+  const token=getToken();
+  if(!token) return {saved:false,reason:'guest'};
+  try{
+    const r=await fetch('/api/results',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({mode:modeName,score:finalScore,correctAnswers,totalQuestions})});
+    let data={}; try{ data=await r.json(); }catch{}
+    if(r.status===401){ clearSession(); updateAccountUI(); return {saved:false,reason:'expired'}; }
+    if(!r.ok) return {saved:false,reason:'error',message:data.error};
+    if(data.user){ localStorage.setItem('m5kUser',JSON.stringify(data.user)); updateAccountUI(); }
+    if(data.rank) window.m5kRank=data.rank;
+    return {saved:true,user:data.user,rank:data.rank};
+  }catch(e){ return {saved:false,reason:'network'}; }
+}
+function setSaveNote(text,color){
+  let n=el('saveNote');
+  if(!n){ const box=el('resultText'); if(!box) return; n=document.createElement('p'); n.id='saveNote'; n.className='save-note'; box.insertAdjacentElement('afterend',n); }
+  n.textContent=text; n.style.color=color||'#c5aaff'; n.style.display=text?'block':'none';
+  const b=el('saveNoteBtn'); if(b) b.remove();
+  if(text && /سجّل|انتهت/.test(text)){ const btn=document.createElement('button'); btn.id='saveNoteBtn'; btn.className='secondary'; btn.textContent='تسجيل الدخول'; btn.onclick=()=>openAuth('login'); n.insertAdjacentElement('afterend',btn); }
+}
+async function afterSave(promise){
+  if(!getToken()){ setSaveNote('سجّل دخولك أو أنشئ حسابًا لتُحفظ نتائجك وتظهر في المتصدرين 🏆','#c5aaff'); return; }
+  setSaveNote('جاري حفظ نتيجتك...','#c5aaff');
+  const r=await promise;
+  if(r.saved) setSaveNote('تم حفظ نتيجتك في حسابك'+(r.rank?` — ترتيبك العالمي: ${r.rank}`:'')+' 🏆','#4ade80');
+  else if(r.reason==='expired') setSaveNote('انتهت جلستك، سجّل الدخول من جديد لحفظ نتائجك القادمة.','#fbbf24');
+  else if(r.reason==='guest') setSaveNote('سجّل دخولك لحفظ نتائجك في المتصدرين 🏆','#c5aaff');
+  else setSaveNote('تعذر حفظ النتيجة الآن'+(r.message?': '+r.message:'.'),'#fb7185');
+}
+async function onlineSavedNote(ranking){
+  if(!getToken()){ setSaveNote('سجّل دخولك لتُحفظ نتائج تحدي الأصدقاء في حسابك 🏆','#c5aaff'); return; }
+  if((ranking||[]).length<2){ setSaveNote('',''); return; }
+  setSaveNote('تم حفظ نتيجتك في حسابك 🏆','#4ade80');
+  setTimeout(()=>restoreSession(),1200);
 }
 
 function finishGame(){
@@ -1290,24 +1412,27 @@ function finishGame(){
     const ranking = Object.entries(friendScores).sort((a,b)=>b[1]-a[1]);
     const winner = ranking[0];
     const history = JSON.parse(localStorage.getItem("m5kHistory") || "[]");
-    ranking.forEach(([player, playerScore]) => history.unshift({name:player, mode:"friends", score:playerScore, date:new Date().toLocaleDateString("ar-DZ")}));
+    ranking.forEach(([player, playerScore]) => history.unshift({name:player, mode:"friends", score:playerScore, date:new Date().toLocaleDateString("ar-DZ"),dayKey:new Date().toISOString().slice(0,10),dayKey:new Date().toISOString().slice(0,10)}));
     localStorage.setItem("m5kHistory", JSON.stringify(history.slice(0,100)));
-    saveResultToBackend('friends',winner[1],Math.max(0,...Object.values(friendCorrectCounts)),round.length);
+    if(typeof renderM5KRewards==='function') renderM5KRewards();
+    const acct=getUser(); const mine=acct && ranking.find(([n])=>n.toLowerCase()===String(acct.username).toLowerCase());
+    const savedP = mine ? saveResultToBackend('friends',mine[1],friendCorrectCounts[mine[0]]||0,round.length) : Promise.resolve({saved:false,reason:getToken()?'error':'guest',message:'سجّل اللعب باسم حسابك لتُحفظ النتيجة.'});
     el("resultTitle").textContent = "🏆 انتهى تحدي الأصدقاء!";
     el("resultText").innerHTML = `الفائز: <b>${escapeHtml(winner[0])}</b><br>` + ranking.map((r,i)=>`${i+1}. ${escapeHtml(r[0])} — ${r[1]} نقطة`).join("<br>");
-    el("resultScore").textContent = winner[1]; show("result"); return;
+    el("resultScore").textContent = winner[1]; show("result",true); afterSave(savedP); return;
   }
   const name = localStorage.getItem("m5kPlayerName") || "لاعب";
   const modeName = modes[selectedMode]?.name || "اللعبة";
   const history = JSON.parse(localStorage.getItem("m5kHistory") || "[]");
-  history.unshift({name,mode:selectedMode,score,date:new Date().toLocaleDateString("ar-DZ")});
+  history.unshift({name,mode:selectedMode,score,correctAnswers:Number(window.m5kRoundCorrect||0),date:new Date().toLocaleDateString("ar-DZ"),dayKey:new Date().toISOString().slice(0,10),dayKey:new Date().toISOString().slice(0,10)});
   localStorage.setItem("m5kHistory",JSON.stringify(history.slice(0,50)));
+  if(typeof renderM5KRewards==='function') renderM5KRewards();
   const best = Number(localStorage.getItem("m5kBest") || 0); if(score > best) localStorage.setItem("m5kBest",String(score));
   const correctAnswers = Number(window.m5kRoundCorrect || 0);
-  saveResultToBackend(selectedMode,score,correctAnswers,round.length);
+  const savedP = saveResultToBackend(selectedMode,score,correctAnswers,round.length);
   el("resultTitle").textContent="🏆 انتهت اللعبة!";
   el("resultText").textContent=`${name}، نتيجتك في ${modeName} هي ${score} نقطة.`;
-  el("resultScore").textContent=score; show("result");
+  el("resultScore").textContent=score; show("result",true); afterSave(savedP);
 }
 
 function playAgain(){
@@ -1329,22 +1454,116 @@ function updateStats(){
   if(el("bestScore")) el("bestScore").textContent = best;
 }
 
+let leaderMode='';
+function leaderRow(r,i,me){
+  const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1);
+  const mine=me&&String(r.username).toLowerCase()===String(me.username).toLowerCase();
+  return `<div class="leader ${i===0?'first':''} ${i===1?'second':''} ${i===2?'third':''} ${mine?'me':''}"><b class="leader-rank">${medal}</b><i>${escapeHtml(String(r.username||'ل').charAt(0))}</i><span>${escapeHtml(r.username)}${mine?' <small>(أنت)</small>':''}</span><strong>${Number(r.best_score)||0}</strong></div>`;
+}
 async function updateLeaders(){
   const board=document.querySelector('.leaderboard'); if(!board) return;
+  const head=document.querySelector('#leaders .center-head');
+  if(head && !el('leaderMode')){
+    const sel=document.createElement('select'); sel.id='leaderMode'; sel.className='leader-filter';
+    sel.innerHTML='<option value="">🏆 كل الألعاب</option>'+Object.entries(modes).filter(([k])=>k!=='mixed').map(([k,m])=>`<option value="${k}">${escapeHtml(m.name)}</option>`).join('')+'<option value="friends-online">👥 تحدي الأصدقاء أونلاين</option>';
+    sel.onchange=()=>{leaderMode=sel.value;updateLeaders();};
+    head.appendChild(sel);
+  }
+  const me=getUser();
   try{
-    const r=await fetch('/api/leaderboard');
+    const r=await fetch('/api/leaderboard?limit=50'+(leaderMode?'&mode='+encodeURIComponent(leaderMode):''),{cache:'no-store'});
     if(!r.ok) throw new Error();
-    const data=await r.json();
-    const rows=data.players||[];
-    if(rows.length){ board.innerHTML=rows.slice(0,10).map((r,i)=>`<div class="leader ${i===0?'first':''} ${i===1?'second':''} ${i===2?'third':''}"><b class="leader-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</b><i>${escapeHtml((r.username||'ل').charAt(0))}</i><span>${escapeHtml(r.username)}</span><strong>${Number(r.best_score)||0}</strong></div>`).join(''); }
-    else board.innerHTML='<p>لا توجد نتائج عالمية بعد. سجّل حسابًا والعب أول جولة!</p>';
+    const rows=(await r.json()).players||[];
+    let html=rows.length?rows.map((x,i)=>leaderRow(x,i,me)).join(''):'<p>لا توجد نتائج بعد'+(leaderMode?' في هذه اللعبة':'')+'. '+(getToken()?'العب أول جولة!':'سجّل حسابًا والعب أول جولة!')+'</p>';
+    if(getToken() && !leaderMode && window.m5kRank && me && !rows.some(x=>String(x.username).toLowerCase()===String(me.username).toLowerCase()))
+      html+=`<p class="my-rank">ترتيبك العالمي: <b>${window.m5kRank}</b> — أفضل نتيجة: <b>${Number(me.best_score)||0}</b></p>`;
+    if(!getToken()) html+='<p class="my-rank">سجّل دخولك لتظهر نتيجتك هنا وتبقى محفوظة في حسابك.</p>';
+    board.innerHTML=html;
   }catch(e){
     const history=JSON.parse(localStorage.getItem('m5kHistory')||'[]'); const best={}; history.forEach(x=>best[x.name]=Math.max(best[x.name]||0,Number(x.score)||0));
-    const rows=Object.entries(best).sort((a,b)=>b[1]-a[1]).slice(0,10);
-    board.innerHTML=rows.length?rows.map((r,i)=>`<div class="leader ${i===0?'first':''} ${i===1?'second':''} ${i===2?'third':''}"><b class="leader-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</b><i>${escapeHtml((r[0]||'ل').charAt(0))}</i><span>${escapeHtml(r[0])}</span><strong>${r[1]}</strong></div>`).join(''):'<p>العب أول جولة لتظهر نتائجك هنا.</p>';
+    const rows=Object.entries(best).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([username,best_score])=>({username,best_score}));
+    board.innerHTML='<p class="my-rank">⚠️ تعذر الاتصال بالسيرفر، هذه نتائجك المحفوظة على جهازك فقط.</p>'+(rows.length?rows.map((x,i)=>leaderRow(x,i,null)).join(''):'<p>العب أول جولة لتظهر نتائجك هنا.</p>');
   }
 }
 
+let authMode='login';
+function openAuth(mode='login'){authMode=mode; show('auth'); renderAuth();}
+function toggleAuthMode(){authMode=authMode==='login'?'register':'login';renderAuth();}
+function renderAuth(){
+  const reg=authMode==='register';
+  if(el('authTitle')) el('authTitle').textContent=reg?'إنشاء حساب جديد':'مرحباً بعودتك';
+  if(el('authSubtitle')) el('authSubtitle').textContent=reg?'أنشئ حسابك وابدأ بحفظ نتائجك وإنجازاتك.':'سجّل الدخول لمتابعة ألعابك وحفظ تقدمك.';
+  el('authLoginTab')?.classList.toggle('active',!reg);
+  el('authRegisterTab')?.classList.toggle('active',reg);
+  if(el('forgotPasswordLink')) el('forgotPasswordLink').style.display=reg?'none':'block';
+  if(el('authUsernameWrap')) el('authUsernameWrap').style.display=reg?'block':'none';
+  if(el('authLoginLabel')) el('authLoginLabel').textContent=reg?'البريد الإلكتروني':'اسم المستخدم أو البريد الإلكتروني';
+  if(el('authEmail')) el('authEmail').placeholder=reg?'example@gmail.com':'TOUFIK_GAMER';
+  if(el('authEmail')) el('authEmail').type=reg?'email':'text';
+  if(el('authPassword')) { el('authPassword').placeholder='10+ characters'; el('authPassword').minLength=10; }
+  if(el('authSubmit')) el('authSubmit').textContent=reg?'إنشاء الحساب':'تسجيل الدخول';
+  if(el('authSwitch')) el('authSwitch').textContent=reg?'لديك حساب؟ سجّل الدخول':'ليس لديك حساب؟ سجل الآن';
+  if(el('authMsg')) el('authMsg').textContent='';
+}
+async function submitAuth(){
+  const msg=el('authMsg'); msg.style.color=''; msg.textContent='جاري المعالجة...';
+  const body={login:el('authEmail').value.trim(),email:el('authEmail').value.trim(),password:el('authPassword').value};
+  if(authMode==='register') body.username=el('authUsername').value.trim();
+  try{
+    const r=await fetch('/api/auth/'+(authMode==='register'?'register':'login'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    let data={}; try{data=await r.json();}catch{}
+    if(!r.ok) throw new Error(data.error||'تعذر الاتصال بالخادم. تأكد أن Backend يعمل.');
+    setSession(data.token,data.user); updateAccountUI(); if(el('authPassword')) el('authPassword').value=''; msg.textContent='تم بنجاح ✅'; setTimeout(()=>show('home'),500);
+  }catch(e){msg.textContent=(e instanceof TypeError?'تعذر تنفيذ العملية حاليًا. حاول مرة أخرى.':e.message);msg.style.color='#fb7185';}
+}
+async function startPasswordReset(){
+  const email=prompt('اكتب نفس البريد الإلكتروني الذي سجلت به حسابك:');
+  if(!email) return;
+  const msg=el('authMsg');
+  try{
+    let r=await fetch('/api/auth/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email.trim()})});
+    let data=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(data.error||'تعذر إرسال رمز التحقق.');
+    const code=prompt('إذا كان البريد مسجلًا، سيصلك رمز تحقق من 6 أرقام. اكتب الرمز هنا:');
+    if(!code) return;
+    const password=prompt('اكتب كلمة المرور الجديدة (10 أحرف على الأقل):');
+    if(!password) return;
+    r=await fetch('/api/auth/reset-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email.trim(),code:code.trim(),password})});
+    data=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(data.error||'تعذر تغيير كلمة المرور.');
+    alert('تم تغيير كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.');
+  }catch(e){ if(msg){msg.textContent=e.message;msg.style.color='#fb7185';}else alert(e.message); }
+}
+
+function updateAccountUI(){
+  const token=getToken(); const status=el('accountStatus'), btn=document.querySelector('.account-btn');
+  if(token){
+    const u=getUser(); const n=(u&&u.username)||localStorage.getItem('m5kPlayerName')||'لاعب';
+    if(status) status.textContent='👤 '+n+(u&&u.best_score?' · 🏆 '+u.best_score:'');
+    if(btn){btn.textContent='تسجيل الخروج';btn.onclick=logout;}
+  }else{
+    if(status) status.textContent='زائر';
+    if(btn){btn.textContent='تسجيل الدخول';btn.onclick=()=>openAuth('login');}
+  }
+}
+function logout(){
+  clearSession(); updateAccountUI();
+  if(onlineFriendSocket){ try{ onlineFriendSocket.disconnect(); }catch(e){} onlineFriendSocket=null; }
+  if(el('leaders')?.classList.contains('active')) updateLeaders();
+}
+// Re-validate the saved login every time the site opens, so the account stays connected (or is cleanly reset if expired).
+async function restoreSession(){
+  const token=getToken(); if(!token){ updateAccountUI(); return; }
+  try{
+    const r=await fetch('/api/me',{headers:{'Authorization':'Bearer '+token},cache:'no-store'});
+    if(r.status===401){ clearSession(); updateAccountUI(); return; }
+    if(!r.ok) throw new Error();
+    const data=await r.json();
+    localStorage.setItem('m5kUser',JSON.stringify(data.user)); localStorage.setItem('m5kPlayerName',data.user.username); if(data.user.preferences){localStorage.setItem('m5kPreferences',JSON.stringify(data.user.preferences));applyPreferences(data.user.preferences);}
+    window.m5kRank=data.rank||null;
+  }catch(e){ /* offline: keep the saved session */ }
+  updateAccountUI();
+}
 
 function escapeHtml(value){
   return String(value).replace(/[&<>"']/g, ch => ({
@@ -1352,10 +1571,43 @@ function escapeHtml(value){
   }[ch]));
 }
 
+const DEFAULT_PREFS = { theme: 'dark', language: 'ar' };
+function currentPreferences(){
+ const u=getUser();let prefs=u?.preferences||{};if(typeof prefs==='string'){try{prefs=JSON.parse(prefs)}catch{prefs={}}}
+ return Object.assign({},DEFAULT_PREFS,prefs);
+}
+function applyPreferences(prefs){
+ prefs=Object.assign({},DEFAULT_PREFS,prefs||{});document.documentElement.dataset.theme=prefs.theme;document.documentElement.lang=prefs.language;document.documentElement.dir=prefs.language==='ar'?'rtl':'ltr';
+ const colors={dark:'#0b0b12',midnight:'#050914',light:'#f4f6fb'},meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=colors[prefs.theme]||colors.dark;
+ const theme=document.getElementById('themeSetting'),lang=document.getElementById('languageSetting');if(theme)theme.value=prefs.theme;if(lang)lang.value=prefs.language;
+ const nav=document.querySelectorAll('.topbar nav button');const labels=prefs.language==='en'?['Home','Games','Leaderboard','Contact','Social']:prefs.language==='fr'?['Accueil','Jeux','Classement','Contact','Réseaux']:['الرئيسية','الألعاب','المتصدرون','تواصل معنا','حساباتي'];nav.forEach((b,i)=>{if(labels[i])b.textContent=labels[i];});
+ document.body.classList.toggle('theme-light',prefs.theme==='light');document.body.classList.toggle('theme-midnight',prefs.theme==='midnight');
+}
+function loadPreferencesUI(){applyPreferences(currentPreferences());}
+async function savePreferences(){
+ const msg=document.getElementById('settingsMessage'),token=getToken();
+ const prefs={theme:document.getElementById('themeSetting')?.value||'dark',language:document.getElementById('languageSetting')?.value||'ar'};
+ applyPreferences(prefs);
+ if(!token){if(msg)msg.textContent='سجّل الدخول أولاً حتى نحفظ إعداداتك في حسابك عبر الإنترنت.';show('settings');return;}
+ if(msg)msg.textContent='جارٍ حفظ الإعدادات في حسابك…';
+ try{const r=await fetch('/api/me/preferences',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(prefs)});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'تعذر الحفظ');if(d.user){localStorage.setItem('m5kUser',JSON.stringify(d.user));}else{const u=getUser()||{};u.preferences=prefs;localStorage.setItem('m5kUser',JSON.stringify(u));}if(msg)msg.textContent='تم حفظ إعداداتك على حسابك بنجاح.';
+ }catch(e){if(msg)msg.textContent='تعذر حفظ الإعدادات على الخادم. تحقق من الاتصال ثم حاول مجددًا.';}
+}
+function renderAccountProfile(){const u=getUser(),logged=!!getToken(),set=(id,v)=>{const n=document.getElementById(id);if(n)n.textContent=v;};set('profileUsername',logged&&u?u.username:'زائر');const av=el('profileAvatar'),photo=logged&&u&&u.preferences&&u.preferences.avatar;if(av){av.textContent=photo?'':(logged&&u?String(u.username||'M').charAt(0).toUpperCase():'M');av.style.backgroundImage=photo?`url(\"${photo}\")`:'';av.classList.toggle('has-photo',!!photo);}const upload=el('avatarFileInput');if(upload)upload.disabled=!logged;set('profileEmail',logged&&u?(u.email||''):'سجّل الدخول لمزامنة حسابك ونتائجك.');set('accountGames',logged&&u?Number(u.games_played)||0:0);set('accountBest',logged&&u?Number(u.best_score)||0:0);set('accountPoints',logged&&u?Number(u.total_points)||0:0);const b=document.getElementById('profileLogin');if(b)b.style.display=logged?'none':'inline-flex';}
+async function uploadAvatar(event){const file=event.target.files&&event.target.files[0],msg=el('avatarUploadMsg');if(!file)return;if(!getToken()){if(msg)msg.textContent='سجّل الدخول أولًا لرفع صورة حسابك.';return;}if(!/^image\/(png|jpeg|webp|gif)$/.test(file.type)||file.size>300*1024){if(msg)msg.textContent='اختر صورة PNG أو JPG أو WEBP أو GIF بحجم أقل من 300KB.';event.target.value='';return;}try{if(msg)msg.textContent='جارٍ تجهيز الصورة…';const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file);});const token=getToken(),r=await fetch('/api/me/avatar',{method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({avatar:data})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'تعذر حفظ الصورة');localStorage.setItem('m5kUser',JSON.stringify(d.user));renderAccountProfile();renderHeaderAccount();if(msg)msg.textContent='تم تحديث صورتك الشخصية بنجاح ✅';}catch(e){if(msg)msg.textContent=e.message||'تعذر رفع الصورة. حاول مرة أخرى.';}finally{event.target.value='';}}
+
+window.addEventListener('beforeunload', event => {
+  if(el('quiz')?.classList.contains('active') && !el('exitGameModal')?.classList.contains('active')){event.preventDefault();event.returnValue='هل تريد مغادرة اللعبة؟';return event.returnValue;}
+});
+
 document.addEventListener("DOMContentLoaded", () => {
+  renderHeaderAccount();
   const saved = localStorage.getItem("m5kPlayerName") || "";
   if(el("playerName")) el("playerName").value = saved;
   updateHintButton();
+  applyPreferences(currentPreferences());
+  updateAccountUI();
+  restoreSession();
   refreshFriendsLive();
   setInterval(refreshFriendsLive, 3000);
   window.addEventListener("beforeunload", leaveFriendsHeartbeat);
@@ -1375,7 +1627,7 @@ function onlineSocketReady(){
     const msg=el('friendOnlineMsg'); if(msg && new URLSearchParams(location.search).get('owner')==='1') msg.textContent='⚠️ شغّل الموقع عبر http://localhost:3000 حتى يعمل اللعب أونلاين.';
     return false;
   }
-  if(!onlineFriendSocket) onlineFriendSocket=io();
+  if(!onlineFriendSocket) onlineFriendSocket=io({auth:cb=>cb({token:getToken()})});
   return true;
 }
 function onlineMsg(text,color){
@@ -1407,7 +1659,7 @@ function setupOnlineSocketHandlers(){
     el('lobbySub').textContent=data.host?'شارك الكود مع أصدقائك وانتظر دخولهم.':'انتظرت بدء صاحب الغرفة للعبة.';
     el('lobbyHostControls').style.display=data.host?'block':'none'; show('lobby'); renderOnlineLobby(data);
   });
-  onlineFriendSocket.on('room:update',data=>{ if(data.code===onlineFriendRoom) renderOnlineLobby(data); });
+  onlineFriendSocket.on('room:update',data=>{ if(data.code!==onlineFriendRoom) return; onlineFriendHost=!!data.host; const hc=el('lobbyHostControls'); if(hc) hc.style.display=data.host?'block':'none'; renderOnlineLobby(data); });
   onlineFriendSocket.on('room:error',data=>onlineMsg('❌ '+(data.message||'حدث خطأ.'),'#fb7185'));
   onlineFriendSocket.on('room:started',data=>{
     onlineFriendMode=true; onlineFriendAnswered=false; friendPlayers=(data.players||[]).map(p=>p.name);
@@ -1434,7 +1686,7 @@ function setupOnlineSocketHandlers(){
     const ranking=data.players||[]; const winner=ranking[0];
     el('resultTitle').textContent='🏆 انتهى تحدي الأصدقاء!';
     el('resultText').innerHTML=(winner?`الفائز: <b>${escapeHtml(winner.name)}</b><br>`:'')+ranking.map((p,i)=>`${i+1}. ${escapeHtml(p.name)} — ${Number(p.score)||0} نقطة`).join('<br>');
-    el('resultScore').textContent=winner?winner.score:0; show('result');
+    el('resultScore').textContent=winner?winner.score:0; show('result',true); onlineSavedNote(ranking);
   });
   onlineFriendSocket.on('disconnect',()=>{ if(onlineFriendMode) onlineMsg('⚠️ انقطع الاتصال بالسيرفر. حاول الدخول للغرفة من جديد.','#fb7185'); });
 }
@@ -1500,4 +1752,58 @@ function submitAnswer(choice,button){
 function startFriendsSetup(){
   friendMode=false; onlineFriendMode=false; onlineFriendRoom=''; onlineFriendHost=false; if(onlineSocketReady()) setupOnlineSocketHandlers();
   const saved=localStorage.getItem('m5kPlayerName')||''; if(el('friendOnlineName'))el('friendOnlineName').value=saved; if(el('friendRoomCode'))el('friendRoomCode').value=''; onlineMsg('أنشئ غرفة جديدة أو أدخل كود غرفة صديق.','#c5aaff'); show('friendsSetup');
+}
+
+// M5K v23: daily challenge and lightweight achievement tracker
+const M5K_DAILY_MODES = [
+  {mode:'quiz', title:'اختبار المعلومات العامة', desc:'كم معلومة تقدر تجمع اليوم؟ اختبر ثقافتك ونافس على أفضل نتيجة.'},
+  {mode:'riddle', title:'لغز اليوم', desc:'فكّر بهدوء وجرّب تحل الألغاز قبل ما ينتهي الوقت.'},
+  {mode:'emoji', title:'شفرة الإيموجي', desc:'حل الرموز وخمّن الكلمة أو الشخصية المخفية.'},
+  {mode:'flagguess', title:'جولة حول العالم', desc:'اختبر معرفتك بالأعلام والدول.'},
+  {mode:'pattern', title:'تحدي الأنماط', desc:'اكتشف الرقم التالي وأثبت سرعة ملاحظتك.'},
+  {mode:'wordmix', title:'خبير الكلمات', desc:'رتّب الحروف واكتشف الكلمة الصحيحة.'},
+  {mode:'memory', title:'اختبار الذاكرة', desc:'ركّز جيدًا وتذكّر التسلسل الصحيح.'}
+];
+function getM5KDailyChallenge(){
+  const now=new Date();
+  const key=`${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+  const seed=key.split('-').reduce((n,v)=>n*31+Number(v),7);
+  return {...M5K_DAILY_MODES[Math.abs(seed)%M5K_DAILY_MODES.length],key};
+}
+function playDailyChallenge(){const c=getM5KDailyChallenge();if(typeof chooseMode==='function')chooseMode(c.mode);}
+function renderM5KRewards(){
+  const title=document.getElementById('dailyChallengeTitle'),desc=document.getElementById('dailyChallengeDesc');
+  const daily=getM5KDailyChallenge();if(title)title.textContent=daily.title;if(desc)desc.textContent=daily.desc;
+  const grid=document.getElementById('achievementGrid');if(!grid)return;
+  let history=[];try{history=JSON.parse(localStorage.getItem('m5kHistory')||'[]');if(!Array.isArray(history))history=[];}catch(_){history=[];}
+  const rounds=history.length;const best=history.reduce((m,r)=>Math.max(m,Number(r.score)||0),0);
+  const correct=history.reduce((n,r)=>n+(Number(r.correctAnswers)||0),0);
+  const daySet=new Set(history.map(r=>r.dayKey).filter(Boolean));
+  const today=new Date();const todayKey=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);const yKey=`${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+  let streak=0, cursor=new Date(today);if(!daySet.has(todayKey))cursor=yesterday;
+  while(daySet.has(`${cursor.getFullYear()}-${String(cursor.getMonth()+1).padStart(2,'0')}-${String(cursor.getDate()).padStart(2,'0')}`)&&streak<365){streak++;cursor.setDate(cursor.getDate()-1);}
+  const streakNode=document.getElementById('streakCount');if(streakNode)streakNode.textContent=streak;
+  const achievements=[
+    {icon:'🎮',name:'أول خطوة',desc:'أكمل أول جولة لعب.',value:rounds,target:1,format:v=>`${Math.min(v,1)}/1`},
+    {icon:'🔥',name:'لا توقف التحدي',desc:'أكمل 5 جولات لعب.',value:rounds,target:5,format:v=>`${Math.min(v,5)}/5`},
+    {icon:'🏆',name:'صيّاد النقاط',desc:'حقق 1000 نقطة في جولة.',value:best,target:1000,format:v=>`${Math.min(v,1000)}/1000`},
+    {icon:'🧠',name:'عقل سريع',desc:'أجب عن 10 أسئلة صحيحة في جولاتك.',value:correct,target:10,format:v=>`${Math.min(v,10)}/10`}
+  ];
+  grid.innerHTML=achievements.map(a=>`<article class="achievement-card ${a.value>=a.target?'unlocked':''}"><span>${a.icon}</span><div><b>${a.name}</b><p>${a.desc}</p></div><small>${a.value>=a.target?'تم الفتح ✓':a.format(a.value)}</small></article>`).join('');
+  const note=document.getElementById('rewardsNote');if(note)note.textContent=getToken()?'تظهر هذه الإنجازات اعتمادًا على سجل اللعب في هذا المتصفح؛ نتائج الحساب تُحفظ على الخادم عند نجاح المزامنة.':'إنجازات الضيف تُحسب على هذا المتصفح. سجّل الدخول لحفظ نتائج اللعب في حسابك.';
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',renderM5KRewards);else renderM5KRewards();
+
+
+// Share a concise result card using native sharing when available.
+async function shareGameResult(){
+  const scoreText=document.getElementById('resultScore')?.textContent||'0';
+  const title=document.getElementById('resultTitle')?.textContent||'نتيجتي في مِخّك';
+  const text=`${title}\nحققت ${scoreText} نقطة في مِخّك! جرّب تتحداني 🎮`;
+  try{if(navigator.share){await navigator.share({title:'نتيجتي في مِخّك',text,url:location.origin});return;}if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(`${text}\n${location.origin}`);alert('تم نسخ نتيجتك ورابط الموقع، شاركهما مع أصدقائك!');return;}prompt('انسخ نتيجتك وشاركها مع أصدقائك:',`${text}\n${location.origin}`);}catch(e){if(e&&e.name!=='AbortError')alert('تعذرت المشاركة الآن. حاول مرة أخرى.');}
+}
+
+function showGoogleAuthNotice(){
+ const msg=el('authMsg'); if(!msg) return; msg.style.color='#fb7185'; msg.textContent='تسجيل الدخول عبر Google غير مفعّل لهذا الموقع بعد. استخدم البريد الإلكتروني وكلمة المرور؛ يلزم إعداد Google OAuth على خادم M5K لتفعيله.';
 }

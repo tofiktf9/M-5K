@@ -1,3 +1,4 @@
+-- ملاحظة: هذا الملف اختياري. السيرفر ينشئ قاعدة البيانات والجداول تلقائيًا عند التشغيل.
 CREATE DATABASE IF NOT EXISTS m5k CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE m5k;
 
@@ -11,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
   games_played INT NOT NULL DEFAULT 0,
   total_points INT NOT NULL DEFAULT 0,
   correct_answers INT NOT NULL DEFAULT 0,
+  preferences JSON NULL,
   INDEX idx_best_score (best_score)
 ) ENGINE=InnoDB;
 
@@ -20,6 +22,7 @@ CREATE TABLE IF NOT EXISTS game_results (
   mode VARCHAR(40) NOT NULL,
   score INT NOT NULL DEFAULT 0,
   correct_answers INT NOT NULL DEFAULT 0,
+  preferences JSON NULL,
   total_questions INT NOT NULL DEFAULT 0,
   played_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
