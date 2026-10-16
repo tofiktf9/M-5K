@@ -838,6 +838,7 @@ function renderHeaderAccount(){
   const avatar=logged&&u.preferences&&u.preferences.avatar?u.preferences.avatar:'';
   ['headerAvatar','dropdownAvatar'].forEach(id=>{const n=el(id);if(!n)return;n.textContent=avatar?'':initial;n.style.backgroundImage=avatar?`url(\"${avatar}\")`:'';n.classList.toggle('has-photo',!!avatar);});set('headerProfileName',logged?name:'حسابي');set('dropdownName',name);set('dropdownEmail',logged?(u.email||'حسابك في مِخّك'):'سجّل الدخول لمزامنة بياناتك');set('accountStatus',logged?'متصل':'زائر');
   const login=el('dropdownLogin');if(login)login.style.display=logged?'none':'flex';
+  const logoutButton=el('profileLogoutButton');if(logoutButton)logoutButton.style.display=logged?'flex':'none';
   const wrap=el('profileMenuWrap');if(wrap)wrap.hidden=!logged;
   const auth= document.querySelector('.account-area > .account-btn');if(auth)auth.style.display=logged?'none':'inline-flex';
 }
@@ -1804,6 +1805,24 @@ async function shareGameResult(){
   try{if(navigator.share){await navigator.share({title:'نتيجتي في مِخّك',text,url:location.origin});return;}if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(`${text}\n${location.origin}`);alert('تم نسخ نتيجتك ورابط الموقع، شاركهما مع أصدقائك!');return;}prompt('انسخ نتيجتك وشاركها مع أصدقائك:',`${text}\n${location.origin}`);}catch(e){if(e&&e.name!=='AbortError')alert('تعذرت المشاركة الآن. حاول مرة أخرى.');}
 }
 
-function showGoogleAuthNotice(){
- const msg=el('authMsg'); if(!msg) return; msg.style.color='#fb7185'; msg.textContent='تسجيل الدخول عبر Google غير مفعّل لهذا الموقع بعد. استخدم البريد الإلكتروني وكلمة المرور؛ يلزم إعداد Google OAuth على خادم M5K لتفعيله.';
+function startTikTokLogin(){
+  window.location.assign('/auth/tiktok');
 }
+
+// TikTok returns the short-lived M5K session token in the URL fragment.
+// Fragments are not sent in HTTP requests; remove it immediately after storing.
+(function consumeTikTokReturn(){
+  if(!location.hash) return;
+  const params=new URLSearchParams(location.hash.slice(1));
+  const token=params.get('tiktok_token');
+  const error=params.get('tiktok_error');
+  if(token){
+    localStorage.setItem('m5kToken',token);
+    history.replaceState(null,document.title,location.pathname+location.search);
+    restoreSession().then(()=>{renderHeaderAccount();show('home');});
+  }else if(error){
+    history.replaceState(null,document.title,location.pathname+location.search);
+    const messages={cancelled:'تم إلغاء تسجيل الدخول عبر TikTok.',failed:'تعذر التحقق من حساب TikTok. تأكد من إعدادات التطبيق.',profile:'تعذر جلب بيانات حساب TikTok.',account:'تعذر إنشاء حساب M5K عبر TikTok.'};
+    setTimeout(()=>{const msg=el('authMsg');if(msg){msg.style.color='#fb7185';msg.textContent=messages[error]||'تعذر تسجيل الدخول عبر TikTok.';}openAuth('login');},0);
+  }
+})();
