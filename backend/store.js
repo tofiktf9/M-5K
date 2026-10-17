@@ -45,6 +45,7 @@ async function createMysqlStore(cfg) {
     username VARCHAR(30) NOT NULL UNIQUE,
     email VARCHAR(190) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
+    github_id VARCHAR(32) NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     best_score INT NOT NULL DEFAULT 0,
     games_played INT NOT NULL DEFAULT 0,
@@ -65,6 +66,7 @@ async function createMysqlStore(cfg) {
     INDEX idx_results_score (score),
     INDEX idx_results_mode (mode)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`);
+  await pool.query('ALTER TABLE users ADD COLUMN github_id VARCHAR(32) NULL UNIQUE').catch(() => {});
   await pool.query('ALTER TABLE users ADD COLUMN preferences JSON NULL').catch(() => {});
   // Older databases may lack the mode index – ignore the error if it already exists.
   await pool.query('CREATE INDEX idx_results_mode ON game_results(mode)').catch(() => {});
@@ -85,6 +87,23 @@ async function createMysqlStore(cfg) {
     async createUser({ username, email, passwordHash }) {
       try {
         const [r] = await pool.query('INSERT INTO users(username,email,password_hash) VALUES(?,?,?)', [username, email, passwordHash]);
+        return r.insertId;
+      } catch (e) {
+        if (e && e.code === 'ER_DUP_ENTRY') throw dupError();
+        throw e;
+      }
+    },
+    async getUserByGithubId(githubId) {
+      const [rows] = await pool.query(`SELECT ${USER_FIELDS} FROM users WHERE github_id=? LIMIT 1`, [String(githubId)]);
+      return rows[0] || null;
+    },
+    async isUsernameTaken(username) {
+      const [rows] = await pool.query('SELECT id FROM users WHERE username=? LIMIT 1', [username]);
+      return rows.length > 0;
+    },
+    async createGithubUser({ username, email, passwordHash, githubId, avatar }) {
+      try {
+        const [r] = await pool.query('INSERT INTO users(username,email,password_hash,github_id,preferences) VALUES(?,?,?,?,?)', [username, email, passwordHash, String(githubId), JSON.stringify({ theme: 'dark', language: 'ar', avatar: avatar || '' })]);
         return r.insertId;
       } catch (e) {
         if (e && e.code === 'ER_DUP_ENTRY') throw dupError();
@@ -206,6 +225,20 @@ async function createFileStore(dir) {
         id, username, email, password_hash: passwordHash, created_at: new Date().toISOString(),
         best_score: 0, games_played: 0, total_points: 0, correct_answers: 0
       });
+      await persist();
+      return id;
+    },
+    async getUserByGithubId(githubId) {
+      const u = db.users.find(x => String(x.github_id || '') === String(githubId));
+      return pickUser(u);
+    },
+    async isUsernameTaken(username) {
+      return db.users.some(u => lower(u.username) === lower(username));
+    },
+    async createGithubUser({ username, email, passwordHash, githubId, avatar }) {
+      if (db.users.some(u => String(u.github_id || '') === String(githubId)) || await this.isTaken(username, email)) throw dupError();
+      const id = db.nextUserId++;
+      db.users.push({ id, username, email, password_hash: passwordHash, github_id: String(githubId), created_at: new Date().toISOString(), best_score: 0, games_played: 0, total_points: 0, correct_answers: 0, preferences: { theme: 'dark', language: 'ar', avatar: avatar || '' } });
       await persist();
       return id;
     },

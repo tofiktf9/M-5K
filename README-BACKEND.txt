@@ -46,3 +46,20 @@ M5K Backend v19 — الحسابات والمتصدرون محفوظة دائم�
 5) لا تضع المفتاح في ملفات الموقع أو GitHub، ولا ترسله في المحادثات.
 مهم: لا تحتاج إلى SMTP_HOST أو SMTP_PORT أو SMTP_USER أو SMTP_PASS في هذه النسخة؛ الإرسال يتم عبر HTTPS API لتجاوز حظر منافذ SMTP في استضافة Render المجانية.
 ملاحظة: رموز الاستعادة صالحة 10 دقائق، وكلمة المرور الجديدة يجب أن تكون 10 أحرف على الأقل.
+
+
+=== GitHub OAuth login (v41) ===
+1) In GitHub, open Settings > Developer settings > OAuth Apps > New OAuth App.
+2) Homepage URL: https://m5k.onrender.com
+3) Authorization callback URL: https://m5k.onrender.com/api/auth/github/callback
+4) Generate a Client Secret. In Render > your Web Service > Environment, add:
+   GITHUB_CLIENT_ID = (the Client ID shown by GitHub)
+   GITHUB_CLIENT_SECRET = (the Client Secret; keep it secret)
+   GITHUB_CALLBACK_URL = https://m5k.onrender.com/api/auth/github/callback
+5) Save changes and redeploy. Do not put Client Secret in frontend files or commit it to GitHub.
+6) Test from a private/incognito browser window. The OAuth button appears on the login/register screen.
+
+Note: Existing users with the same verified email are not automatically linked for security; they should sign in using their existing method. GitHub accounts without a verified email may use a GitHub noreply address for the account record.
+
+
+AdSense note: This source archive did not contain an ads.txt file. Before deploying, copy your existing valid ads.txt into the project root (m5k_v19_src/ads.txt). The server whitelist now allows /ads.txt to be served. Do not use a blank or invented ads.txt; keep the exact publisher line supplied by AdSense.

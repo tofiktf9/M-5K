@@ -1785,3 +1785,42 @@ async function shareGameResult(){
   try{if(navigator.share){await navigator.share({title:'نتيجتي في مِخّك',text,url:location.origin});return;}if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(`${text}\n${location.origin}`);alert('تم نسخ نتيجتك ورابط الموقع، شاركهما مع أصدقائك!');return;}prompt('انسخ نتيجتك وشاركها مع أصدقائك:',`${text}\n${location.origin}`);}catch(e){if(e&&e.name!=='AbortError')alert('تعذرت المشاركة الآن. حاول مرة أخرى.');}
 }
 
+
+
+/* ---------- GitHub OAuth return handler ---------- */
+(function handleOAuthReturn(){
+  if (!window.location.hash || !window.location.hash.startsWith('#oauth_')) return;
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  const token = params.get('oauth_token');
+  const encodedUser = params.get('oauth_user');
+  const error = params.get('oauth_error');
+  // Remove sensitive data from the address bar immediately.
+  history.replaceState(null, '', window.location.pathname + window.location.search);
+  if (token && encodedUser) {
+    try {
+      const b64 = encodedUser.replace(/-/g,'+').replace(/_/g,'/');
+      const user = JSON.parse(decodeURIComponent(escape(atob(b64 + '='.repeat((4 - b64.length % 4) % 4)))));
+      setSession(token, user);
+      updateAccountUI();
+      renderHeaderAccount();
+      return;
+    } catch (_) {
+      const msg = document.getElementById('authMsg');
+      if (msg) { msg.textContent = 'تعذر إكمال تسجيل الدخول باستخدام GitHub. حاول مرة أخرى.'; msg.style.color = '#fb7185'; }
+      if (typeof openAuth === 'function') openAuth('login');
+      return;
+    }
+  }
+  const messages = {
+    github_not_configured: 'تسجيل GitHub غير مهيأ بعد. أكمل إعدادات OAuth في Render.',
+    github_denied: 'ألغيت تسجيل الدخول باستخدام GitHub.',
+    github_state: 'انتهت صلاحية محاولة تسجيل الدخول. حاول مرة أخرى.',
+    github_failed: 'تعذر تسجيل الدخول باستخدام GitHub. حاول مرة أخرى.',
+    github_email_conflict: 'هذا البريد مرتبط بحساب موجود. سجّل الدخول بالطريقة المعتادة بدل إنشاء حساب مكرر.'
+  };
+  if (error) {
+    if (typeof openAuth === 'function') openAuth('login');
+    const msg = document.getElementById('authMsg');
+    if (msg) { msg.textContent = messages[error] || messages.github_failed; msg.style.color = '#fb7185'; }
+  }
+})();

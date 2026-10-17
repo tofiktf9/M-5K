@@ -49,7 +49,7 @@ app.use(express.json({ limit: '500kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 
 /* ---------- static files: whitelist only (the old version exposed backend/.env!) ---------- */
-const PUBLIC_FILES = new Set(['index.html', 'app.js', 'style.css', 'favicon.svg', 'og-image.png', 'apple-touch-icon.png', 'robots.txt', 'sitemap.xml']);
+const PUBLIC_FILES = new Set(['index.html', 'app.js', 'style.css', 'favicon.svg', 'og-image.png', 'apple-touch-icon.png', 'robots.txt', 'sitemap.xml', 'ads.txt']);
 app.get('/', (req, res) => res.sendFile(path.join(ROOT, 'index.html')));
 app.get('/:file', (req, res, next) => {
   if (!PUBLIC_FILES.has(req.params.file)) return next();
@@ -98,6 +98,112 @@ app.get('/api/health', wrap(async (req, res) => {
 }));
 
 const authLimit = limiter(8, 15 * 60 * 1000);
+
+/* ---------- GitHub OAuth login ----------
+ * Configure GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET and GITHUB_CALLBACK_URL in Render.
+ * Callback URL must exactly match the URL registered in the GitHub OAuth App.
+ */
+function parseCookies(header) {
+  const out = Object.create(null);
+  for (const part of String(header || '').split(';')) {
+    const i = part.indexOf('=');
+    if (i > 0) {
+      const k = part.slice(0, i).trim();
+      try { out[k] = decodeURIComponent(part.slice(i + 1).trim()); } catch (_) {}
+    }
+  }
+  return out;
+}
+function secureCookie(req) {
+  return process.env.NODE_ENV === 'production' || req.secure || String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https';
+}
+function setOAuthStateCookie(req, res, state) {
+  const bits = [`m5k_github_state=${encodeURIComponent(state)}`, 'HttpOnly', 'SameSite=Lax', 'Path=/api/auth/github/callback', 'Max-Age=600'];
+  if (secureCookie(req)) bits.push('Secure');
+  res.setHeader('Set-Cookie', bits.join('; '));
+}
+function clearOAuthStateCookie(req, res) {
+  const bits = ['m5k_github_state=', 'HttpOnly', 'SameSite=Lax', 'Path=/api/auth/github/callback', 'Max-Age=0'];
+  if (secureCookie(req)) bits.push('Secure');
+  res.setHeader('Set-Cookie', bits.join('; '));
+}
+function oauthFailure(res, code) {
+  const safe = ['github_not_configured','github_denied','github_state','github_failed','github_email_conflict'];
+  return res.redirect('/#oauth_error=' + (safe.includes(code) ? code : 'github_failed'));
+}
+app.get('/api/auth/github', (req, res) => {
+  const clientId = String(process.env.GITHUB_CLIENT_ID || '').trim();
+  const callback = String(process.env.GITHUB_CALLBACK_URL || '').trim();
+  if (!clientId || !process.env.GITHUB_CLIENT_SECRET || !callback) return oauthFailure(res, 'github_not_configured');
+  const state = crypto.randomBytes(32).toString('hex');
+  setOAuthStateCookie(req, res, state);
+  const url = new URL('https://github.com/login/oauth/authorize');
+  url.searchParams.set('client_id', clientId);
+  url.searchParams.set('redirect_uri', callback);
+  url.searchParams.set('scope', 'read:user user:email');
+  url.searchParams.set('state', state);
+  return res.redirect(url.toString());
+});
+app.get('/api/auth/github/callback', wrap(async (req, res) => {
+  clearOAuthStateCookie(req, res);
+  if (req.query.error) return oauthFailure(res, 'github_denied');
+  const stateCookie = parseCookies(req.headers.cookie).m5k_github_state;
+  const stateQuery = String(req.query.state || '');
+  if (!stateCookie || !stateQuery || stateCookie.length !== stateQuery.length || !crypto.timingSafeEqual(Buffer.from(stateCookie), Buffer.from(stateQuery))) return oauthFailure(res, 'github_state');
+  const clientId = String(process.env.GITHUB_CLIENT_ID || '').trim();
+  const clientSecret = String(process.env.GITHUB_CLIENT_SECRET || '').trim();
+  const callback = String(process.env.GITHUB_CALLBACK_URL || '').trim();
+  const code = String(req.query.code || '');
+  if (!clientId || !clientSecret || !callback || !/^[A-Za-z0-9]+$/.test(code)) return oauthFailure(res, 'github_not_configured');
+
+  const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, code, redirect_uri: callback, state: stateQuery })
+  });
+  const tokenData = await tokenResponse.json().catch(() => ({}));
+  if (!tokenResponse.ok || !tokenData.access_token) return oauthFailure(res, 'github_failed');
+  const ghHeaders = { 'Authorization': 'Bearer ' + tokenData.access_token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'M5K-Login' };
+  const profileResponse = await fetch('https://api.github.com/user', { headers: ghHeaders });
+  const profile = await profileResponse.json().catch(() => ({}));
+  if (!profileResponse.ok || !Number.isSafeInteger(Number(profile.id)) || !profile.login) return oauthFailure(res, 'github_failed');
+
+  let email = '';
+  const emailsResponse = await fetch('https://api.github.com/user/emails', { headers: ghHeaders });
+  if (emailsResponse.ok) {
+    const emails = await emailsResponse.json().catch(() => []);
+    if (Array.isArray(emails)) {
+      const selected = emails.find(e => e && e.primary && e.verified && e.email) || emails.find(e => e && e.verified && e.email);
+      if (selected) email = cleanEmail(selected.email);
+    }
+  }
+  const githubId = String(profile.id);
+  let user = await store.getUserByGithubId(githubId);
+  if (!user) {
+    const base = cleanUsername(profile.login).replace(/[^\p{L}\p{N}_.-]/gu, '').slice(0, 24) || 'Player';
+    let username = base;
+    for (let n = 0; await store.isUsernameTaken(username); n++) {
+      username = (base.slice(0, Math.max(3, 24 - String(n + 1).length)) + String(n + 1)).slice(0, 30);
+      if (n > 9999) return oauthFailure(res, 'github_failed');
+    }
+    if (!email) email = `github-${githubId}@users.noreply.github.com`;
+    // Never silently link an existing email account to an external provider.
+    if (await store.getUserByEmail(email)) return oauthFailure(res, 'github_email_conflict');
+    const passwordHash = await bcrypt.hash(crypto.randomBytes(48).toString('hex'), 12);
+    try {
+      const id = await store.createGithubUser({ username, email, passwordHash, githubId, avatar: typeof profile.avatar_url === 'string' ? profile.avatar_url : '' });
+      user = await store.getUser(id);
+    } catch (e) {
+      if (e && e.code === 'DUPLICATE') return oauthFailure(res, 'github_email_conflict');
+      throw e;
+    }
+  }
+  if (!user) return oauthFailure(res, 'github_failed');
+  const token = tokenFor(user);
+  // Send the session token in the URL fragment, which is not sent to the server in HTTP requests.
+  const payload = Buffer.from(JSON.stringify(user)).toString('base64url');
+  return res.redirect('/#oauth_token=' + encodeURIComponent(token) + '&oauth_user=' + encodeURIComponent(payload));
+}));
 
 app.post('/api/auth/register', authLimit, wrap(async (req, res) => {
   const username = cleanUsername(req.body.username), email = cleanEmail(req.body.email), password = String(req.body.password || '');

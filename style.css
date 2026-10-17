@@ -487,3 +487,7 @@ button:hover,a:hover,[role="button"]:hover,nav button:hover,.game-card:hover,.fe
 button.tiktok-auth-btn{font:inherit;cursor:pointer;text-align:center;}
 
 #profileLogoutButton{color:inherit}#profileLogoutButton:hover{background:transparent}
+
+
+/* GitHub OAuth button */
+.oauth-separator{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted,#9ca3af);font-size:.85rem}.oauth-separator:before,.oauth-separator:after{content:"";height:1px;flex:1;background:var(--border,rgba(148,163,184,.25))}.github-auth-button{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:46px;padding:11px 16px;border:1px solid rgba(148,163,184,.35);border-radius:12px;background:#171717;color:#fff;text-decoration:none;font-weight:700;box-sizing:border-box;transition:transform .15s ease,background .15s ease}.github-auth-button:hover{background:#242424;transform:translateY(-1px)}.github-auth-button svg{width:22px;height:22px;flex:none}.github-auth-button:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}
